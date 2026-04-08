@@ -267,6 +267,32 @@ The bookmarked PDF has a hierarchical bookmark tree:
 
 ---
 
+## Step 6 — Export to Google Sheets CSV
+
+```bash
+.venv/bin/python tools/export_sheet.py \
+  <work_dir>/merged_tagged.json \
+  --volume "卷2" \
+  --output <work_dir>/<pdf_stem>_sheet.csv
+```
+
+For a single-chunk PDF, use the chunk's `tagged.json`:
+```bash
+.venv/bin/python tools/export_sheet.py \
+  <work_dir>/<chunk_id>/tagged.json \
+  --volume "卷2" \
+  --output <work_dir>/<pdf_stem>_sheet.csv
+```
+
+Options:
+- `--case-no TEXT` — 案號 short form (e.g. `106上訴3315`). If omitted, auto-derived from the first non-null `case_no` field in the JSON.
+- `--volume TEXT` — 卷別 (e.g. `卷2`). Leave blank if the PDF is not from a specific volume.
+- `--output PATH` — defaults to `<tagged_json_stem>_sheet.csv` in the same directory.
+
+The CSV has 17 columns matching the archive schema in `references/data_model/google_sheet.md`. URL columns (原始 PDF, OCR Google Doc, 標注 PDF) are left empty for manual fill. Import into Google Sheets via File → Import.
+
+---
+
 ## Output Files
 
 | File | Content |
@@ -281,6 +307,7 @@ The bookmarked PDF has a hierarchical bookmark tree:
 | `<work_dir>/merged_ocr.md` | Full corrected OCR (multi-chunk PDFs only) |
 | `<work_dir>/merged_tagged.json` | All documents combined (multi-chunk PDFs only) |
 | `<work_dir>/<pdf_stem>_bookmarked.pdf` | Final bookmarked PDF for lawyer browsing |
+| `<work_dir>/<pdf_stem>_sheet.csv` | Google Sheets import CSV |
 
 ### Data model references
 
