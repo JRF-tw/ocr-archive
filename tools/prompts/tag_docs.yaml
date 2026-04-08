@@ -1,0 +1,73 @@
+name: tag_docs
+description: Extract structured metadata tags for each identified document segment
+
+# Template variables:
+#   {source}    - source markdown filename
+#   {content}   - markdown content for these segments only
+#   {segments}  - JSON array of segments to tag
+
+instruction: |
+  以下是台灣法院卷宗中已切分的文件段落，請為每份文件萃取結構化的 metadata。
+  來源：{source}
+
+  ## 需萃取的欄位
+
+  | 欄位 | 說明 | 範例 |
+  |------|------|------|
+  | doc_type | 標準化文件類型 | 卷宗封面、起訴書、判決書、不起訴處分書、偵查筆錄、警詢筆錄、搜索票、扣押物品目錄、聲請書、裁定書、函文、收據、其他 |
+  | court | 法院或機關名稱 | 臺灣高等法院、臺灣新竹地方法院檢察署 |
+  | case_no | 案號 | 106年度上訴字第3315號 |
+  | date | 文件日期 ISO格式，無法確定則 null | 2017-12-25 |
+  | defendants | 被告姓名列表 | ["劉墨正", "吳炳煌"] |
+  | lawyers | 辯護人／選任律師姓名列表（姓名，不含「律師」稱謂） | ["黃英哲", "許樹依"] |
+  | judges | 法官姓名列表（審判長、受命法官、陪席法官） | ["林孟皇"] |
+  | others | 其他關係人（證人、告訴人、被害人、檢察官等） | ["郭金章", "蔡美燕"] |
+  | charge | 罪名（若有） | 貪污治罪條例、行賄罪 |
+  | tags | 自由標籤，2~5個關鍵詞 | ["上訴審", "貪污", "新竹"] |
+  | summary | 一句話摘要（≤50字） | "106年上訴3315號貪污案卷宗第二卷封面，被告共5人" |
+  | notes | 辨識備註，如文字模糊、內容不完整等 | null |
+
+  ## 當事人分類規則
+
+  - **defendants**：文件中明確標示為「被告」者
+  - **lawyers**：「選任辯護人」、「公設辯護人」、律師事務所代理人
+  - **judges**：「審判長」、「受命法官」、「陪席法官」、「法官」職稱者
+  - **others**：檢察官、證人、告訴人、被害人、鑑定人、書記官、其他未分類者
+  - 無法從此 chunk 判斷者留空陣列 `[]`，不要猜測
+
+  ## 輸出格式
+
+  輸出**純 JSON**，不要加說明文字或 markdown 代碼區塊。格式如下：
+
+  {{
+    "source": "<來源檔名>",
+    "documents": [
+      {{
+        "id": <segment id>,
+        "start_page": <頁碼>,
+        "end_page": <頁碼>,
+        "doc_type": "<標準化類型>",
+        "court": "<法院或機關>",
+        "case_no": "<案號或 null>",
+        "date": "<ISO日期或 null>",
+        "defendants": ["<姓名>"],
+        "lawyers": ["<姓名>"],
+        "judges": ["<姓名>"],
+        "others": ["<姓名>"],
+        "charge": "<罪名或 null>",
+        "tags": ["<標籤>"],
+        "summary": "<一句話摘要>",
+        "notes": "<備註或 null>"
+      }}
+    ]
+  }}
+
+  ---
+  以下是各文件段落的 OCR 內容：
+
+  {content}
+
+  ---
+  以下是需要標記的 segments：
+
+  {segments}
