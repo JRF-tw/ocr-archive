@@ -1,0 +1,28 @@
+# OCR correction rules for Taiwan court case PDFs.
+# Add new rules as errors are discovered across runs.
+#
+# Fields:
+#   pattern:    exact string to find (case-sensitive)
+#   replace:    correct string
+#   confidence: high | medium | low
+#   source:     chunk where this was first observed
+#   notes:      optional context
+
+rules:
+  - pattern: "劉藝正"
+    replace: "劉馨正"
+    confidence: high
+    source: "卷4_chunk_246-250"
+    notes: "OCR confuses 馨/藝 due to scan quality"
+
+  - pattern: "礙礙能力不平執"
+    replace: "證據能力不爭執"
+    confidence: high
+    source: "卷2_chunk_024-028"
+    notes: "Full phrase — must come before the shorter pattern below"
+
+  - pattern: "礙礙能力"
+    replace: "證據能力"
+    confidence: high
+    source: "卷2_chunk_024-028"
+    notes: "證據 misread as 礙礙"
