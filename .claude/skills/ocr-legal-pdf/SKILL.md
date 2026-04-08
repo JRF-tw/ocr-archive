@@ -59,24 +59,9 @@ All intermediate files go **inside** this folder. The original PDF is never move
 
 ### state.json schema
 
-Create this file immediately and update `status` after each chunk completes:
+See `references/data_model/state.md` for full schema and field notes.
 
-```json
-{
-  "pdf": "<pdf_stem>.pdf",
-  "pdf_path": "/absolute/path/to/<pdf_stem>.pdf",
-  "total_pages": 544,
-  "chunk_size": 50,
-  "chunks": [
-    {"id": "chunk_001-050", "start": 1,  "end": 50,  "status": "done"},
-    {"id": "chunk_051-100", "start": 51, "end": 100, "status": "in_progress"},
-    {"id": "chunk_101-150", "start": 101,"end": 150, "status": "pending"}
-  ],
-  "pipeline_step": "ocr"
-}
-```
-
-**Resuming across sessions**: read `state.json` first. Skip chunks where `status == "done"`. Resume from the first `"pending"` or `"in_progress"` chunk.
+Create this file immediately and update `status` after each chunk completes. **Resuming across sessions**: read `state.json` first. Skip chunks where `status == "done"`. Resume from the first `"pending"` or `"in_progress"` chunk.
 
 ---
 
@@ -245,13 +230,7 @@ After all chunks are tagged, merge into a single file:
 1. **Merge OCR**: Concatenate all `ocr_corrected.md` files in page order → `<work_dir>/merged_ocr.md`
 2. **Merge tagged**: Combine all `documents` arrays from each `tagged.json` → `<work_dir>/merged_tagged.json`
 
-`merged_tagged.json` schema:
-```json
-{
-  "source": "<pdf_stem>.pdf",
-  "documents": [ ...all documents from all chunks, sorted by start_page... ]
-}
-```
+See `references/data_model/tagged_document.md` for the full document schema.
 
 For a single-chunk PDF, skip this step — the chunk's `tagged.json` is already the final output.
 
@@ -303,30 +282,17 @@ The bookmarked PDF has a hierarchical bookmark tree:
 | `<work_dir>/merged_tagged.json` | All documents combined (multi-chunk PDFs only) |
 | `<work_dir>/<pdf_stem>_bookmarked.pdf` | Final bookmarked PDF for lawyer browsing |
 
-### Tagged JSON Schema
+### Data model references
 
-```json
-{
-  "source": "filename.pdf",
-  "documents": [{
-    "id": 1,
-    "start_page": 1,
-    "end_page": 3,
-    "doc_type": "卷宗封面",
-    "court": "臺灣高等法院",
-    "case_no": "106年度上訴字第3315號",
-    "date": "2017-12-25",
-    "defendants": ["劉墨正", "吳炳煌"],
-    "lawyers": ["黃英哲", "許樹依"],
-    "judges": ["林孟皇"],
-    "others": ["郭金章"],
-    "charge": "貪污治罪條例",
-    "tags": ["上訴審", "貪污"],
-    "summary": "一句話摘要",
-    "notes": null
-  }]
-}
-```
+All schemas are in `references/data_model/`:
+
+| File | Describes |
+|------|-----------|
+| `state.md` | `state.json` — pipeline progress tracker |
+| `segments.md` | `segments.json` — document boundary detection output |
+| `tagged_document.md` | `tagged.json` / `merged_tagged.json` — structured metadata per document |
+| `qa_log.md` | `qa_log.jsonl` — QA corrections and flags |
+| `google_sheet.md` | Google Sheet archive schema and mapping from `tagged.json` |
 
 ---
 
