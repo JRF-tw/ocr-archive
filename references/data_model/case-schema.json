@@ -1,0 +1,112 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Court Case Extraction Schema",
+  "description": "Nested schema for court case documents with metadata, raw text, and structured extraction fields",
+  "type": "object",
+  "required": ["metadata", "extracted_content"],
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "description": "Case metadata from schema.md",
+      "required": ["編號", "卷宗名稱", "當事人名稱", "起始頁數", "終結頁數"],
+      "properties": {
+        "編號": {
+          "type": "string",
+          "description": "Case ID"
+        },
+        "卷宗名稱": {
+          "type": "string",
+          "description": "Case file name"
+        },
+        "當事人名稱": {
+          "type": "array",
+          "description": "Parties involved",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "證據名稱": {
+          "type": "array",
+          "description": "Evidence names",
+          "items": {
+            "type": "string"
+          }
+        },
+        "起始頁數": {
+          "type": "integer",
+          "description": "Starting page number",
+          "minimum": 1
+        },
+        "終結頁數": {
+          "type": "integer",
+          "description": "Ending page number",
+          "minimum": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "extracted_content": {
+      "type": "object",
+      "description": "Extracted content from OCR processing",
+      "required": ["raw_text", "structured_fields"],
+      "properties": {
+        "raw_text": {
+          "type": "string",
+          "description": "Full raw OCR extracted text from all pages"
+        },
+        "structured_fields": {
+          "type": "object",
+          "description": "Key structured fields extracted from court case",
+          "properties": {
+            "verdict": {
+              "type": "string",
+              "description": "The verdict/ruling (判決內容)"
+            },
+            "charges": {
+              "type": "array",
+              "description": "Charges/罪名",
+              "items": {
+                "type": "string"
+              }
+            },
+            "facts": {
+              "type": "string",
+              "description": "Summary of facts (事實摘要)"
+            },
+            "key_dates": {
+              "type": "object",
+              "description": "Important dates in the case",
+              "properties": {
+                "filed_date": {
+                  "type": "string",
+                  "format": "date",
+                  "description": "Case filing date (YYYY-MM-DD)"
+                },
+                "verdict_date": {
+                  "type": "string",
+                  "format": "date",
+                  "description": "Verdict date (YYYY-MM-DD)"
+                }
+              },
+              "additionalProperties": {
+                "type": "string",
+                "format": "date"
+              }
+            },
+            "evidence": {
+              "type": "array",
+              "description": "List of evidence mentioned",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

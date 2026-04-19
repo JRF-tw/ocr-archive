@@ -1,16 +1,16 @@
 ---
 name: ocr-legal-pdf
-description: Use when given a Taiwan court case PDF (法院卷宗) and asked to OCR it, extract documents, or tag its contents. Input is a PDF path; output is OCR Markdown, segments JSON, tagged JSON, and a bookmarked PDF.
+description: Use when given a Taiwan court case PDF (法院卷宗) and asked to OCR it, extract documents, or tag its contents. Input is a PDF path; output is OCR Markdown, segments JSON, tagged JSON, bookmarked PDF, and (optionally) Drive uploads.
 ---
 
 # OCR Legal PDF Pipeline
 
-Six-step pipeline for Taiwan court case files (法院卷宗). No API key required — uses Claude Code's built-in vision via Max Plan.
+Seven-step pipeline for Taiwan court case files (法院卷宗). No API key required — uses Claude Code's built-in vision via Max Plan.
 
 ## Pipeline Overview
 
 ```
-PDF → working folder → images (50-page chunks) → OCR Markdown → QA/correction → segments JSON → tagged JSON → bookmarked PDF
+PDF → working folder → images (50-page chunks) → OCR Markdown → QA/correction → segments JSON → tagged JSON → bookmarked PDF → Drive upload
 ```
 
 All tools are in `tools/`. Prompts are in `tools/prompts/` (YAML, edit freely).
@@ -289,7 +289,55 @@ Options:
 - `--volume TEXT` — 卷別 (e.g. `卷2`). Leave blank if the PDF is not from a specific volume.
 - `--output PATH` — defaults to `<tagged_json_stem>_sheet.csv` in the same directory.
 
-The CSV has 17 columns matching the archive schema in `references/data_model/google_sheet.md`. URL columns (原始 PDF, OCR Google Doc, 標注 PDF) are left empty for manual fill. Import into Google Sheets via File → Import.
+The CSV has 17 columns matching the archive schema in `references/data_model/google_sheet.md`. URL columns (原始 PDF, OCR Google Doc, 標注 PDF) are left empty — they are auto-filled by Step 7 if using Drive integration.
+
+---
+
+## Step 7 — Upload to Google Drive (optional)
+
+If the PDF was downloaded via `drive_pipeline.py run` (i.e. a `drive_manifest.json` exists in the work directory), upload outputs back to Drive:
+
+```bash
+.venv/bin/python -m tools.drive_pipeline upload <work_dir>
+```
+
+This uploads three outputs in sequence:
+1. `<pdf_stem>_bookmarked.pdf` → Drive output folder (nested under `<case_no>/<volume>_<pdf_stem>/`)
+2. `merged_ocr.md` (or single-chunk `ocr_corrected.md`) → same Drive subfolder
+3. `<pdf_stem>_sheet.csv` → appended to the Archive tab of the Google Sheet
+
+After appending, the URL columns (原始 PDF, OCR Google Doc, 標注 PDF) are back-filled automatically for the newly appended rows.
+
+### Resume after failure
+
+If any upload fails, re-run the same command — it skips entries already marked `uploaded` or `appended`:
+
+```bash
+.venv/bin/python -m tools.drive_pipeline upload <work_dir>
+```
+
+Use `--force` to re-upload everything regardless of status:
+
+```bash
+.venv/bin/python -m tools.drive_pipeline upload <work_dir> --force
+```
+
+### Check upload status
+
+```bash
+.venv/bin/python -m tools.drive_pipeline status <work_dir>
+```
+
+Prints a table showing: input file info, pipeline status, and each upload entry with its status, Drive URL, and any errors.
+
+### Prerequisites
+
+- `~/.jrf/credentials.json` — OAuth2 client credentials (from Google Cloud Console)
+- `~/.jrf/token.json` — auto-created on first run (browser OAuth flow)
+- `~/.jrf/drive_config.json` — copy from `drive_config.template.json` and fill in folder/spreadsheet IDs
+- Install Drive dependencies: `pip install -r requirements-drive.txt`
+
+See `references/data_model/drive_manifest.md` for the full manifest schema.
 
 ---
 
@@ -308,6 +356,7 @@ The CSV has 17 columns matching the archive schema in `references/data_model/goo
 | `<work_dir>/merged_tagged.json` | All documents combined (multi-chunk PDFs only) |
 | `<work_dir>/<pdf_stem>_bookmarked.pdf` | Final bookmarked PDF for lawyer browsing |
 | `<work_dir>/<pdf_stem>_sheet.csv` | Google Sheets import CSV |
+| `<work_dir>/drive_manifest.json` | Drive upload state tracker (Step 7) |
 
 ### Data model references
 
@@ -320,6 +369,7 @@ All schemas are in `references/data_model/`:
 | `tagged_document.md` | `tagged.json` / `merged_tagged.json` — structured metadata per document |
 | `qa_log.md` | `qa_log.jsonl` — QA corrections and flags |
 | `google_sheet.md` | Google Sheet archive schema and mapping from `tagged.json` |
+| `drive_manifest.md` | `drive_manifest.json` — Drive upload state tracker |
 
 ---
 

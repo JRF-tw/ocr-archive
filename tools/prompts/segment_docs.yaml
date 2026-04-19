@@ -1,0 +1,52 @@
+name: segment_docs
+description: Detect document boundaries in OCR Markdown from Taiwan court case files (法院卷宗文件切分)
+
+# Template variables:
+#   {source}    - source markdown filename
+#   {n_pages}   - total pages in this chunk
+#   {page_offset} - page number of the first page in this chunk (for multi-chunk runs)
+#   {content}   - the full OCR markdown text
+
+instruction: |
+  以下是台灣法院卷宗的 OCR Markdown 內容，共 {n_pages} 頁（頁碼從第 {page_offset} 頁起）。
+  來源：{source}
+
+  請辨識其中包含的**獨立文件**，輸出 JSON。
+
+  ## 辨識規則
+
+  每份獨立文件通常具備以下特徵之一：
+  - 明確的文件標題（如「臺灣新竹地方法院刑事判決」、「偵查筆錄」、「搜索票」）
+  - 獨立的文號或案號
+  - 明確的發文機關與日期
+  - 頁碼從 1 重新開始
+  - 有騎縫章或關防用印分隔
+
+  空白頁、卷宗封面、辦理事項表等行政文件也各自算一份。
+
+  ## 輸出格式
+
+  輸出**純 JSON**，不要加說明文字或 markdown 代碼區塊。格式如下：
+
+  {{
+    "source": "<來源檔名>",
+    "page_offset": <此chunk第一頁的頁碼>,
+    "segments": [
+      {{
+        "id": 1,
+        "start_page": <絕對頁碼>,
+        "end_page": <絕對頁碼>,
+        "doc_type_hint": "<文件類型，如：卷宗封面、起訴書、判決書、偵查筆錄、搜索票、扣押物品目錄等>",
+        "boundary_confidence": "high|medium|low",
+        "boundary_note": "<若 confidence 非 high，說明原因>"
+      }}
+    ]
+  }}
+
+  若某頁無法判斷屬於哪份文件（如空白頁夾在兩份文件之間），歸入前一份文件。
+  若此 chunk 結尾的文件可能延續到下一個 chunk，請在最後一個 segment 加上 `"continues": true`。
+
+  ---
+  以下是 OCR Markdown 內容：
+
+  {content}
