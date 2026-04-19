@@ -155,15 +155,12 @@ class GoogleDriveClient:
             ) from e
 
     def get_share_url(self, file_id: str) -> str:
-        """Return the web view URL for a Drive file."""
         return f"https://drive.google.com/file/d/{file_id}/view"
 
     @staticmethod
     def pdf_mime() -> str:
-        """Return the MIME type for PDF files."""
         return "application/pdf"
 
     @staticmethod
     def markdown_mime() -> str:
-        """Return the MIME type for Markdown files."""
         return "text/markdown"

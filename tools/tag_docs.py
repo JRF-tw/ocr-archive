@@ -19,33 +19,13 @@ Output:
 
 import argparse
 import json
-import re
 import sys
 from pathlib import Path
 
-import yaml
+from tools._shared import load_prompt, split_into_pages
 
 PROMPTS_DIR = Path(__file__).parent / "prompts"
 DEFAULT_PROMPT = PROMPTS_DIR / "tag_docs.yaml"
-
-PAGE_HEADER_RE = re.compile(r"^##\s+第\s*(\d+)\s*頁", re.MULTILINE)
-
-
-def load_prompt(yaml_path: Path) -> dict:
-    with yaml_path.open(encoding="utf-8") as f:
-        return yaml.safe_load(f)
-
-
-def split_into_pages(markdown: str) -> dict[int, str]:
-    """Return {page_number: page_content} dict."""
-    pages = {}
-    matches = list(PAGE_HEADER_RE.finditer(markdown))
-    for i, m in enumerate(matches):
-        page_num = int(m.group(1))
-        start = m.start()
-        end = matches[i + 1].start() if i + 1 < len(matches) else len(markdown)
-        pages[page_num] = markdown[start:end].strip()
-    return pages
 
 
 def extract_pages_for_segment(pages: dict[int, str], start: int, end: int) -> str:
@@ -104,7 +84,6 @@ def main():
         print("ERROR: No segments found in JSON.", file=sys.stderr)
         sys.exit(1)
 
-    # Split segments into batches
     batch_size = args.batch_size
     batches = [segments[i:i + batch_size] for i in range(0, len(segments), batch_size)]
     total_batches = len(batches)
@@ -116,7 +95,6 @@ def main():
         else list(enumerate(batches, 1))
 
     for batch_num, batch in target_batches:
-        # Extract relevant page content for this batch
         all_start = min(s["start_page"] for s in batch)
         all_end = max(s["end_page"] for s in batch)
         content = extract_pages_for_segment(pages, all_start, all_end)

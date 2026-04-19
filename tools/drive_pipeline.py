@@ -14,10 +14,10 @@ import argparse
 import json
 import sys
 import time
-from datetime import datetime, timezone
 from pathlib import Path
 
 from tools import drive_manifest
+from tools.drive_manifest import _utc_now_iso
 from tools.google_drive_client import GoogleDriveClient
 from tools.google_sheets_client import GoogleSheetsClient
 
@@ -25,10 +25,6 @@ from tools.google_sheets_client import GoogleSheetsClient
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
-
-def _utc_now_iso() -> str:
-    return datetime.now(timezone.utc).isoformat()
-
 
 def _load_config(args: argparse.Namespace) -> dict:
     """Load config from ~/.jrf/drive_config.json, overlay CLI flags."""
@@ -88,6 +84,40 @@ def _derive_case_no(documents: list) -> str:
         if raw:
             return str(raw)
     return ""
+
+
+def _upload_file_entry(
+    manifest: dict,
+    work_dir: Path,
+    drive: GoogleDriveClient,
+    key: str,
+    file_path: Path | None,
+    mime_type: str,
+    folder_id: str,
+    force: bool,
+    not_found_error: str,
+) -> bool:
+    """Upload one manifest entry. Returns True if it failed."""
+    if manifest.get("uploads", {}).get(key, {}).get("status") == "uploaded" and not force:
+        return False
+    if file_path is None or not file_path.exists():
+        drive_manifest.mark_upload(manifest, key, "failed", error=not_found_error)
+        drive_manifest.save(manifest, work_dir)
+        return True
+    try:
+        result = drive.upload_file(file_path, folder_id, mime_type)
+        url = drive.get_share_url(result["id"])
+        drive_manifest.mark_upload(
+            manifest, key, "uploaded",
+            drive_file_id=result["id"], drive_url=url,
+            uploaded_at=_utc_now_iso(), local_path=str(file_path),
+        )
+        drive_manifest.save(manifest, work_dir)
+        return False
+    except Exception as e:
+        drive_manifest.mark_upload(manifest, key, "failed", error=str(e))
+        drive_manifest.save(manifest, work_dir)
+        return True
 
 
 def _load_tagged_json(work_dir: Path) -> dict | None:
@@ -267,77 +297,31 @@ def cmd_upload(args: argparse.Namespace) -> int:
 
     any_failed = False
 
-    # --- 1. Upload bookmarked PDF (EC-2, EC-5) ---
-    bm_status = manifest.get("uploads", {}).get("bookmarked_pdf", {}).get("status")
-    if bm_status == "uploaded" and not force:
-        pass  # skip
-    else:
-        bookmarked_files = sorted(work_dir.glob("*_bookmarked.pdf"))
-        if bookmarked_files:
-            bm_path = bookmarked_files[0]
-            try:
-                result = drive.upload_file(bm_path, sub_folder, "application/pdf")
-                url = drive.get_share_url(result["id"])
-                drive_manifest.mark_upload(
-                    manifest, "bookmarked_pdf", "uploaded",
-                    drive_file_id=result["id"], drive_url=url,
-                    uploaded_at=_utc_now_iso(), local_path=str(bm_path),
-                )
-                drive_manifest.save(manifest, work_dir)
-            except Exception as e:
-                drive_manifest.mark_upload(
-                    manifest, "bookmarked_pdf", "failed", error=str(e),
-                )
-                drive_manifest.save(manifest, work_dir)
-                any_failed = True
-        else:
-            drive_manifest.mark_upload(
-                manifest, "bookmarked_pdf", "failed",
-                error="No *_bookmarked.pdf found in work directory",
-            )
-            drive_manifest.save(manifest, work_dir)
-            any_failed = True
+    # --- 1. Upload bookmarked PDF ---
+    bm_files = sorted(work_dir.glob("*_bookmarked.pdf"))
+    any_failed |= _upload_file_entry(
+        manifest, work_dir, drive,
+        drive_manifest.BOOKMARKED_PDF,
+        bm_files[0] if bm_files else None,
+        "application/pdf", sub_folder, force,
+        "No *_bookmarked.pdf found in work directory",
+    )
 
-    # --- 2. Upload OCR markdown (EC-5, EC-6) ---
-    ocr_status = manifest.get("uploads", {}).get("ocr_markdown", {}).get("status")
-    if ocr_status == "uploaded" and not force:
-        pass  # skip
-    else:
-        ocr_path = work_dir / "merged_ocr.md"
-        if not ocr_path.exists():
-            # Single-chunk fallback
-            chunks = sorted(work_dir.glob("*/ocr_corrected.md"))
-            ocr_path = chunks[0] if chunks else None
+    # --- 2. Upload OCR markdown ---
+    ocr_path: Path | None = work_dir / "merged_ocr.md"
+    if not ocr_path.exists():
+        chunks = sorted(work_dir.glob("*/ocr_corrected.md"))
+        ocr_path = chunks[0] if chunks else None
+    any_failed |= _upload_file_entry(
+        manifest, work_dir, drive,
+        drive_manifest.OCR_MARKDOWN,
+        ocr_path,
+        "text/markdown", sub_folder, force,
+        "No merged_ocr.md or */ocr_corrected.md found",
+    )
 
-        if ocr_path and ocr_path.exists():
-            try:
-                result = drive.upload_file(
-                    ocr_path, sub_folder, "text/markdown",
-                )
-                url = drive.get_share_url(result["id"])
-                drive_manifest.mark_upload(
-                    manifest, "ocr_markdown", "uploaded",
-                    drive_file_id=result["id"], drive_url=url,
-                    uploaded_at=_utc_now_iso(), local_path=str(ocr_path),
-                )
-                drive_manifest.save(manifest, work_dir)
-            except Exception as e:
-                drive_manifest.mark_upload(
-                    manifest, "ocr_markdown", "failed", error=str(e),
-                )
-                drive_manifest.save(manifest, work_dir)
-                any_failed = True
-        else:
-            # EC-6: no OCR file found — mark failed, don't crash
-            drive_manifest.mark_upload(
-                manifest, "ocr_markdown", "failed",
-                error="No merged_ocr.md or */ocr_corrected.md found",
-            )
-            drive_manifest.save(manifest, work_dir)
-            any_failed = True
-
-    # --- 3. Append CSV to Archive sheet (EC-5) ---
-    sr_status = manifest.get("uploads", {}).get("sheet_rows", {}).get("status")
+    # --- 3. Append CSV to Archive sheet ---
+    sr_status = manifest.get("uploads", {}).get(drive_manifest.SHEET_ROWS, {}).get("status")
     if sr_status == "appended" and not force:
         pass  # skip
     else:
@@ -347,11 +331,6 @@ def cmd_upload(args: argparse.Namespace) -> int:
             try:
                 sheets.ensure_tab(spreadsheet_id, archive_tab)
 
-                # EC-7: Track row count before append for scoped back-fill
-                existing_values = sheets.find_rows_by_value(
-                    spreadsheet_id, archive_tab, 0, "",
-                )
-                # Get total row count by reading all values
                 all_data = (
                     sheets.service.spreadsheets()
                     .values()
@@ -364,7 +343,7 @@ def cmd_upload(args: argparse.Namespace) -> int:
                     spreadsheet_id, archive_tab, csv_path,
                 )
                 drive_manifest.mark_upload(
-                    manifest, "sheet_rows", "appended",
+                    manifest, drive_manifest.SHEET_ROWS, "appended",
                     local_csv_path=str(csv_path),
                     spreadsheet_id=spreadsheet_id,
                     spreadsheet_url=GoogleSheetsClient.get_spreadsheet_url(spreadsheet_id),
@@ -374,45 +353,33 @@ def cmd_upload(args: argparse.Namespace) -> int:
                 )
                 drive_manifest.save(manifest, work_dir)
 
-                # --- 4. Back-fill URL columns (EC-7: scoped to new rows) ---
-                original_pdf_url = ""
-                if file_id:
-                    original_pdf_url = drive.get_share_url(file_id)
-                bookmarked_url = manifest.get("uploads", {}).get(
-                    "bookmarked_pdf", {},
-                ).get("drive_url", "") or ""
-                ocr_url = manifest.get("uploads", {}).get(
-                    "ocr_markdown", {},
-                ).get("drive_url", "") or ""
+                # --- 4. Back-fill URL columns in one batch call ---
+                original_pdf_url = drive.get_share_url(file_id) if file_id else ""
+                bookmarked_url = manifest["uploads"][drive_manifest.BOOKMARKED_PDF].get("drive_url") or ""
+                ocr_url = manifest["uploads"][drive_manifest.OCR_MARKDOWN].get("drive_url") or ""
 
-                # Back-fill only newly appended rows
+                url_updates = []
                 for row_num in range(old_row_count + 1, old_row_count + 1 + rows_appended):
+                    url_updates.extend([
+                        {"range": f"{archive_tab}!N{row_num}", "values": [[original_pdf_url]]},
+                        {"range": f"{archive_tab}!O{row_num}", "values": [[ocr_url]]},
+                        {"range": f"{archive_tab}!P{row_num}", "values": [[bookmarked_url]]},
+                    ])
+                if url_updates:
                     try:
-                        # 1-based col: 14=原始 PDF, 15=OCR Google Doc, 16=標注 PDF
-                        sheets.update_cell(
-                            spreadsheet_id, archive_tab, row_num, 14, original_pdf_url,
-                        )
-                        sheets.update_cell(
-                            spreadsheet_id, archive_tab, row_num, 15, ocr_url,
-                        )
-                        sheets.update_cell(
-                            spreadsheet_id, archive_tab, row_num, 16, bookmarked_url,
-                        )
+                        sheets.batch_update_cells(spreadsheet_id, url_updates)
                     except Exception as e:
-                        print(
-                            f"WARNING: Failed to back-fill URLs for row {row_num}: {e}",
-                            file=sys.stderr,
-                        )
+                        print(f"WARNING: Failed to back-fill URLs: {e}", file=sys.stderr)
 
             except Exception as e:
                 drive_manifest.mark_upload(
-                    manifest, "sheet_rows", "failed", error=str(e),
+                    manifest, drive_manifest.SHEET_ROWS, "failed", error=str(e),
                 )
                 drive_manifest.save(manifest, work_dir)
                 any_failed = True
         else:
             drive_manifest.mark_upload(
-                manifest, "sheet_rows", "failed",
+                manifest, drive_manifest.SHEET_ROWS, "failed",
                 error="No *_sheet.csv found in work directory",
             )
             drive_manifest.save(manifest, work_dir)
@@ -458,7 +425,7 @@ def cmd_status(args: argparse.Namespace) -> int:
 
     uploads = manifest.get("uploads", {})
     print("=== Upload Status ===")
-    for key in ("bookmarked_pdf", "ocr_markdown", "sheet_rows"):
+    for key in (drive_manifest.BOOKMARKED_PDF, drive_manifest.OCR_MARKDOWN, drive_manifest.SHEET_ROWS):
         entry = uploads.get(key, {})
         status = entry.get("status", "N/A")
         url = entry.get("drive_url") or entry.get("spreadsheet_url") or ""

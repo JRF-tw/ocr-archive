@@ -19,34 +19,13 @@ Output:
 """
 
 import argparse
-import json
-import re
 import sys
 from pathlib import Path
 
-import yaml
+from tools._shared import load_prompt, split_into_pages
 
 PROMPTS_DIR = Path(__file__).parent / "prompts"
 DEFAULT_PROMPT = PROMPTS_DIR / "segment_docs.yaml"
-
-PAGE_HEADER_RE = re.compile(r"^##\s+第\s*(\d+)\s*頁", re.MULTILINE)
-
-
-def load_prompt(yaml_path: Path) -> dict:
-    with yaml_path.open(encoding="utf-8") as f:
-        return yaml.safe_load(f)
-
-
-def split_into_pages(markdown: str) -> list[tuple[int, str]]:
-    """Return list of (page_number, page_content) tuples."""
-    pages = []
-    matches = list(PAGE_HEADER_RE.finditer(markdown))
-    for i, m in enumerate(matches):
-        page_num = int(m.group(1))
-        start = m.start()
-        end = matches[i + 1].start() if i + 1 < len(matches) else len(markdown)
-        pages.append((page_num, markdown[start:end].strip()))
-    return pages
 
 
 def build_chunks(pages: list[tuple[int, str]], chunk_size: int) -> list[list[tuple[int, str]]]:
@@ -89,7 +68,7 @@ def main():
 
     cfg = load_prompt(prompt_path)
     markdown = md_path.read_text(encoding="utf-8")
-    pages = split_into_pages(markdown)
+    pages = list(split_into_pages(markdown).items())
 
     if not pages:
         print("ERROR: No '## 第 N 頁' headers found in Markdown. Is this an OCR output file?",

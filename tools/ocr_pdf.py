@@ -20,20 +20,15 @@ Workflow:
 """
 
 import argparse
-import subprocess
 import sys
 from pathlib import Path
 
-import yaml
+from tools._shared import load_prompt
+from tools.pdf_to_images import convert
 
 
 PROMPTS_DIR = Path(__file__).parent / "prompts"
 DEFAULT_PROMPT = PROMPTS_DIR / "ocr_legal_tw.yaml"
-
-
-def load_prompt(yaml_path: Path) -> dict:
-    with yaml_path.open(encoding="utf-8") as f:
-        return yaml.safe_load(f)
 
 
 def build_prompt(prompt_cfg: dict, pdf_name: str, n_pages: int, output_path: Path, images: list[Path]) -> str:
@@ -68,23 +63,20 @@ def main():
     out_dir = Path(args.out_dir) if args.out_dir else pdf_path.parent / f"{pdf_path.stem}_pages"
     output_md = pdf_path.parent / f"{pdf_path.stem}_ocr.md"
 
-    # Convert PDF to images
-    converter = Path(__file__).parent / "pdf_to_images.py"
-    cmd = [sys.executable, str(converter), str(pdf_path), "--dpi", str(args.dpi), "--out-dir", str(out_dir)]
+    first, last = 0, 0
     if args.pages:
-        cmd += ["--pages", args.pages]
-    subprocess.run(cmd, check=True)
+        parts = args.pages.split("-")
+        first = int(parts[0])
+        last = int(parts[1]) if len(parts) > 1 else first
 
-    images = sorted(out_dir.glob("page*.png"))
+    images = convert(pdf_path, out_dir, args.dpi, first, last)
     if not images:
         print("ERROR: No images generated.", file=sys.stderr)
         sys.exit(1)
 
-    # Load prompt and render
     prompt_cfg = load_prompt(prompt_path)
     prompt = build_prompt(prompt_cfg, pdf_path.name, len(images), output_md, images)
 
-    # Print ready-to-paste block
     print("\n" + "=" * 60)
     print("📋 複製以下內容貼到 Claude Code：")
     print("=" * 60 + "\n")

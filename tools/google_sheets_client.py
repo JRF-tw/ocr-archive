@@ -71,13 +71,15 @@ class GoogleSheetsClient:
                 raise RuntimeError(f"Tab '{tab}' is empty, cannot update job status")
 
             headers = rows[0]
-            target_rows = self.find_rows_by_value(spreadsheet_id, tab, 0, file_id)
-            if not target_rows:
+            row_num = None
+            for i, row in enumerate(rows[1:], start=2):
+                if row and row[0] == file_id:
+                    row_num = i
+                    break
+            if row_num is None:
                 raise RuntimeError(
                     f"file_id '{file_id}' not found in {spreadsheet_id}/{tab}"
                 )
-
-            row_num = target_rows[0]
 
             updates = {"status": status, **fields}
             for field_name, value in updates.items():
@@ -198,7 +200,21 @@ class GoogleSheetsClient:
                 f"Failed to update cell {cell_ref} in {spreadsheet_id}: {e}"
             ) from e
 
+    def batch_update_cells(self, spreadsheet_id: str, updates: list[dict]) -> None:
+        """Update multiple cells in one batch API call.
+
+        Each update: {"range": "Tab!A1", "values": [[value]]}.
+        """
+        try:
+            self.sheets.values().batchUpdate(
+                spreadsheetId=spreadsheet_id,
+                body={"data": updates, "valueInputOption": "RAW"},
+            ).execute()
+        except HttpError as e:
+            raise RuntimeError(
+                f"Failed to batch update cells in {spreadsheet_id}: {e}"
+            ) from e
+
     @staticmethod
     def get_spreadsheet_url(spreadsheet_id: str) -> str:
-        """Return the web URL for a Google Spreadsheet."""
         return f"https://docs.google.com/spreadsheets/d/{spreadsheet_id}/edit"

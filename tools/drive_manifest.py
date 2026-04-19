@@ -8,15 +8,16 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 MANIFEST_FILE = "drive_manifest.json"
+BOOKMARKED_PDF = "bookmarked_pdf"
+OCR_MARKDOWN = "ocr_markdown"
+SHEET_ROWS = "sheet_rows"
 
 
 def _utc_now_iso() -> str:
-    """Return current UTC time as ISO 8601 string."""
     return datetime.now(timezone.utc).isoformat()
 
 
 def _empty_upload_entry() -> dict:
-    """Return a blank upload entry with all fields set to None/pending."""
     return {
         "status": "pending",
         "local_path": None,
@@ -28,7 +29,6 @@ def _empty_upload_entry() -> dict:
 
 
 def _empty_sheet_entry() -> dict:
-    """Return a blank sheet_rows upload entry."""
     return {
         "status": "pending",
         "local_csv_path": None,
@@ -83,7 +83,6 @@ def save(manifest: dict, work_dir: Path) -> None:
 
 
 def mark_upload(manifest: dict, key: str, status: str, **fields) -> dict:
-    """Update the status and extra fields for an upload entry. Mutates in-place."""
     entry = manifest["uploads"][key]
     entry["status"] = status
     for k, v in fields.items():
