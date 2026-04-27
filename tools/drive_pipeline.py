@@ -149,7 +149,7 @@ def _run_single(
     """
     spreadsheet_id = config["spreadsheet_id"]
     queue_tab = config["queue_tab"]
-    work_root = Path(config["work_root"])
+    work_root = Path(config["work_root"]).expanduser()
 
     try:
         metadata = drive.get_file_metadata(file_id)
