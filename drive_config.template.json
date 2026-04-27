@@ -1,0 +1,11 @@
+{
+  "_comment": "Copy this file to ~/.jrf/drive_config.json and replace FILL_IN values with your actual Google Drive and Sheets IDs. See SPEC.md for details.",
+  "work_root": "./work",
+  "input_folder_id": "FILL_IN",
+  "output_folder_id": "FILL_IN",
+  "spreadsheet_id": "FILL_IN",
+  "queue_tab": "Queue",
+  "archive_tab": "Archive",
+  "volume": "",
+  "poll_interval_seconds": 60
+}

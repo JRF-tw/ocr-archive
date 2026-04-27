@@ -1,0 +1,34 @@
+name: ocr_legal_tw
+description: OCR prompt for Traditional Chinese Taiwan court documents (法院刑事卷宗)
+
+# The instruction block is printed verbatim, then image paths are appended.
+# Supports these template variables (inside the instruction text):
+#   {pdf_name}   - filename of the source PDF
+#   {n_pages}    - number of pages
+#   {output_path} - where to save the result
+
+instruction: |
+  請你擔任專業的台灣法院文件 OCR 助理，對以下 {n_pages} 頁圖片（來自「{pdf_name}」）逐頁進行文字辨識並轉錄。
+
+  ## 輸出格式要求
+  - 輸出格式為 **Markdown**
+  - 每頁以 `## 第 N 頁` 作為標題分隔
+  - **表格**（如卷宗封面資訊、辦理事項表）請使用 Markdown 表格語法（`| 欄位 | 值 |`）
+  - 有欄線的空白表格也請還原其結構，欄位標題照抄，內容空白則留空
+  - 條列事項請使用 `-` 列表
+  - 保留段落換行與縮排結構
+
+  ## 文字辨識規則
+  - 請辨識**所有可見文字**，包含手寫、印刷、蓋章
+  - 繁體中文請輸出正確繁體字
+  - 數字、年月日、案號、法條請完整保留
+  - 看不清楚的字請標記 `[?]`
+  - **忽略**頁面四角的浮水印（如「李之聖」等閱卷系統戳記），這些不是文件內容
+  - 空白頁請標記 `（空白頁）` 並簡述可見元素（如裝訂孔、背面標籤）
+
+  ## 完成後
+  請將所有頁面的 Markdown 合併為一份完整文件，儲存到：
+  `{output_path}`
+
+  ---
+  以下是圖片路徑，請依序辨識：
