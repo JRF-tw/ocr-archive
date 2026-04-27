@@ -19,7 +19,7 @@ from pathlib import Path
 
 CREDENTIALS_PATH = Path("~/.jrf/credentials.json").expanduser()
 CONFIG_PATH = Path("~/.jrf/drive_config.json").expanduser()
-REQUIRED_CONFIG_KEYS = ["input_folder_id", "output_folder_id", "spreadsheet_id", "queue_tab", "archive_tab"]
+REQUIRED_CONFIG_KEYS = ["work_root", "input_folder_id", "output_folder_id", "spreadsheet_id", "queue_tab", "archive_tab"]
 
 OK   = "\033[32m✓\033[0m"
 FAIL = "\033[31m✗\033[0m"
