@@ -56,7 +56,7 @@ npm install -g @anthropic-ai/claude-code
 在終端機執行：
 
 ```
-git clone https://github.com/Judicial-Reform-Foundation/ocr-archive.git
+git clone https://github.com/JRF-tw/ocr-archive.git
 cd ocr-archive
 uv sync
 ```
