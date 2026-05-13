@@ -8,6 +8,7 @@
 |------|------|
 | [SETUP.md](SETUP.md) | 首次環境建置（安裝工具、設定 OAuth、Drive 設定檔） |
 | [HOW-TO-DRIVE.md](HOW-TO-DRIVE.md) | 日常操作：從 Drive 下載 PDF、執行 OCR、上傳結果 |
+| [EXPLANATION.md](EXPLANATION.md) | 設計說明：架構決策與各步驟的設計理由 |
 
 ## 環境驗證
 
