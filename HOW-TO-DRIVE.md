@@ -61,6 +61,8 @@ Queue 頁籤狀態更新為 `done`。
 ### 前置條件
 
 - Google Apps Script 觸發器已設定（參見 SETUP.md §5）
+  > **Script Properties 必填：** `FOLDER_ID`（輸入資料夾 ID）及 `SPREADSHEET_ID`（試算表 ID）。  
+  > 在 Apps Script 編輯器中點選「專案設定」→「指令碼屬性」新增這兩個鍵值。
 - 要處理的 PDF 已上傳至輸入資料夾，Apps Script 已將它們加入 Queue 頁籤
 
 ### 步驟
@@ -77,9 +79,10 @@ python -m tools.drive_pipeline watch --once
 python -m tools.drive_pipeline watch
 ```
 
-`watch` 會依序對每筆 Queue 記錄執行 `run`（下載 + 建立工作目錄），  
-OCR 管線仍需在 Claude Code 中手動觸發（`/ocr-legal-pdf`），  
-完成後再對各工作目錄執行 `upload`。
+`watch` 會自動對每筆 Queue 記錄依序執行完整三步驟：
+1. **[1/3] 下載**：從 Drive 下載 PDF，建立工作目錄
+2. **[2/3] OCR**：以 `claude --dangerously-skip-permissions` 自動執行 `/ocr-legal-pdf` 管線（無需手動操作）
+3. **[3/3] 上傳**：將書籤 PDF、OCR Markdown 上傳至 Drive，CSV 附加至 Archive 頁籤
 
 ---
 

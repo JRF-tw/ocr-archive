@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import subprocess
 import sys
 import time
 from pathlib import Path
@@ -121,16 +122,31 @@ def _upload_file_entry(
 
 
 def _load_tagged_json(work_dir: Path) -> dict | None:
-    """Load merged_tagged.json or first *_tagged.json found."""
+    """Load merged_tagged.json or first tagged.json found in a chunk subdirectory."""
     merged = work_dir / "merged_tagged.json"
     if merged.exists():
         with open(merged, encoding="utf-8") as f:
             return json.load(f)
-    tagged_files = sorted(work_dir.glob("*_tagged.json"))
+    tagged_files = sorted(work_dir.glob("*/tagged.json"))
     if tagged_files:
         with open(tagged_files[0], encoding="utf-8") as f:
             return json.load(f)
     return None
+
+
+def _run_ocr(pdf_path: Path) -> int:
+    """Run the OCR pipeline non-interactively via the claude CLI."""
+    project_root = Path(__file__).parent.parent
+    result = subprocess.run(
+        [
+            "claude",
+            "-p",
+            f"/ocr-legal-pdf {pdf_path}",
+            "--dangerously-skip-permissions",
+        ],
+        cwd=str(project_root),
+    )
+    return result.returncode
 
 
 # ---------------------------------------------------------------------------
@@ -142,10 +158,10 @@ def _run_single(
     drive: GoogleDriveClient,
     sheets: GoogleSheetsClient,
     config: dict,
-) -> int:
+) -> tuple[int, Path | None]:
     """Download a single file from Drive, create work dir and manifest.
 
-    Returns 0 on success, 1 on failure.
+    Returns (0, work_dir) on success, (1, None) on failure.
     """
     spreadsheet_id = config["spreadsheet_id"]
     queue_tab = config["queue_tab"]
@@ -161,7 +177,7 @@ def _run_single(
             )
         except Exception:
             pass
-        return 1
+        return 1, None
 
     file_name = metadata["name"]
     pdf_stem = Path(file_name).stem
@@ -201,17 +217,18 @@ def _run_single(
             )
         except Exception:
             pass
-        return 1
+        return 1, None
 
-    # Print work dir to stdout (EC-11)
-    print(str(work_dir.resolve()))
-    return 0
+    return 0, work_dir
 
 
 def cmd_run(args: argparse.Namespace) -> int:
     config = _load_config(args)
     drive, sheets = _build_clients(args)
-    return _run_single(args.file_id, drive, sheets, config)
+    exit_code, work_dir = _run_single(args.file_id, drive, sheets, config)
+    if work_dir is not None:
+        print(str(work_dir.resolve()))
+    return exit_code
 
 
 # ---------------------------------------------------------------------------
@@ -223,6 +240,15 @@ def cmd_watch(args: argparse.Namespace) -> int:
     drive, sheets = _build_clients(args)
     spreadsheet_id = config["spreadsheet_id"]
     queue_tab = config["queue_tab"]
+
+    queue_headers = [
+        "file_id", "file_name", "status",
+        "enqueued_at", "started_at", "completed_at", "work_dir", "error",
+    ]
+    try:
+        sheets.ensure_tab(spreadsheet_id, queue_tab, queue_headers)
+    except Exception as e:
+        print(f"WARNING: Could not ensure Queue tab headers: {e}", file=sys.stderr)
 
     while True:
         try:
@@ -237,11 +263,56 @@ def cmd_watch(args: argparse.Namespace) -> int:
         any_failed = False
         for job in pending:
             fid = job.get("file_id")
+            fname = job.get("file_name", fid or "unknown")
             if not fid:
                 continue
-            result = _run_single(fid, drive, sheets, config)
-            if result != 0:
+
+            started_ts = _utc_now_iso()
+            print(f"\n{'=' * 60}")
+            print(f"  File:    {fname}")
+            print(f"  ID:      {fid}")
+            print(f"  Started: {started_ts}")
+            print(f"  [1/3] Downloading from Drive ...")
+            sys.stdout.flush()
+
+            exit_code, work_dir = _run_single(fid, drive, sheets, config)
+            if exit_code != 0 or work_dir is None:
+                print(f"  FAILED at step 1/3 (download)")
                 any_failed = True
+                continue
+
+            pdf_path = work_dir / fname
+            print(f"  [2/3] Running OCR pipeline ...")
+            sys.stdout.flush()
+
+            ocr_rc = _run_ocr(pdf_path)
+            if ocr_rc != 0:
+                print(f"  FAILED at step 2/3 (OCR), exit code {ocr_rc}")
+                any_failed = True
+                try:
+                    sheets.update_job_status(
+                        spreadsheet_id, queue_tab, fid, "failed",
+                        error=f"OCR failed with exit code {ocr_rc}",
+                    )
+                except Exception:
+                    pass
+                continue
+
+            print(f"  [3/3] Uploading outputs to Drive ...")
+            sys.stdout.flush()
+
+            upload_args = argparse.Namespace(**vars(args))
+            upload_args.work_dir = str(work_dir)
+            upload_args.force = False
+            upload_rc = cmd_upload(upload_args)
+            if upload_rc != 0:
+                print(f"  FAILED at step 3/3 (upload), exit code {upload_rc}")
+                any_failed = True
+                continue
+
+            completed_ts = _utc_now_iso()
+            print(f"  Completed: {completed_ts}")
+            print(f"{'=' * 60}")
 
         if args.once:
             return 1 if any_failed else 0

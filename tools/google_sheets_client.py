@@ -95,7 +95,7 @@ class GoogleSheetsClient:
     def ensure_tab(
         self, spreadsheet_id: str, tab_name: str, header_row: list[str] | None = None
     ) -> None:
-        """Ensure a tab exists in the spreadsheet. Only writes headers to newly-created tabs."""
+        """Ensure a tab exists in the spreadsheet. Writes headers to newly-created tabs or existing empty tabs."""
         try:
             sheet_metadata = self.sheets.get(spreadsheetId=spreadsheet_id).execute()
             existing_tabs = [
@@ -104,6 +104,18 @@ class GoogleSheetsClient:
             ]
 
             if tab_name in existing_tabs:
+                if header_row:
+                    result = self.sheets.values().get(
+                        spreadsheetId=spreadsheet_id,
+                        range=f"{tab_name}!A1",
+                    ).execute()
+                    if not result.get("values"):
+                        self.sheets.values().update(
+                            spreadsheetId=spreadsheet_id,
+                            range=f"{tab_name}!A1",
+                            valueInputOption="RAW",
+                            body={"values": [header_row]},
+                        ).execute()
                 return
 
             body = {
