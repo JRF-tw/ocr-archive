@@ -111,7 +111,13 @@ function getQueueSheet() {
 }
 
 /**
- * Check whether a file_id already exists in column A of the Queue sheet.
+ * Check whether a file_id already exists in column A of the Queue sheet,
+ * regardless of status (pending, done, error, etc.).
+ *
+ * This intentionally covers ALL statuses so that re-scanning after
+ * clearLastCheckedTimestamp does NOT re-enqueue files that have already
+ * been processed (done) or are currently in flight (pending).
+ *
  * @param {GoogleAppsScript.Spreadsheet.Sheet} sheet
  * @param {string} fileId
  * @returns {boolean}
@@ -122,6 +128,8 @@ function isAlreadyQueued(sheet, fileId) {
     return false; // only header row or empty
   }
 
+  // Read only column A (file_id). Status (column C) is intentionally ignored:
+  // any existing row — pending, done, or error — prevents re-queuing.
   var ids = sheet.getRange(2, 1, lastRow - 1, 1).getValues();
   for (var i = 0; i < ids.length; i++) {
     if (ids[i][0] === fileId) {
@@ -150,6 +158,9 @@ function toRfc3339(date) {
  * Run this once from the Apps Script editor after deploying updated code
  * if the stored value is in the old Python ISO format (e.g. 2026-05-23T15:07:52.533937+00:00).
  * After running, the next checkForNewPdfs execution will scan all PDFs from scratch.
+ *
+ * Safe to run even if PDFs have already been processed: isAlreadyQueued checks
+ * ALL statuses (pending, done, error), so no file will be re-enqueued.
  */
 function clearLastCheckedTimestamp() {
   PropertiesService.getScriptProperties().deleteProperty("LAST_CHECKED_TIMESTAMP");
