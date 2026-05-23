@@ -50,8 +50,11 @@ function checkForNewPdfs() {
 
   var files;
   if (lastChecked) {
-    // Search for PDFs modified after last check
-    var query = "mimeType = 'application/pdf' and modifiedDate >= '" + lastChecked + "'";
+    // Use createdDate (not modifiedDate): files synced via Drive for Desktop
+    // carry the local OS modifiedDate which may pre-date LAST_CHECKED_TIMESTAMP,
+    // causing them to be missed. createdDate reflects when the file first
+    // appeared in Drive, regardless of local file age.
+    var query = "mimeType = 'application/pdf' and createdDate >= '" + lastChecked + "'";
     files = folder.searchFiles(query);
   } else {
     // First run — scan all PDFs in folder
@@ -132,11 +135,14 @@ function isAlreadyQueued(sheet, fileId) {
  * Format a Date as RFC 3339 UTC string without milliseconds,
  * e.g. "2024-01-15T10:30:00Z". Drive query strings require this format;
  * toISOString() produces milliseconds (.000Z) which Drive rejects.
+ * Uses string manipulation instead of Utilities.formatDate to avoid
+ * single-quote literal handling quirks in the Apps Script runtime.
  * @param {Date} date
  * @returns {string}
  */
 function toRfc3339(date) {
-  return Utilities.formatDate(date, 'UTC', "yyyy-MM-dd'T'HH:mm:ss'Z'");
+  // "2026-05-24T10:30:00.000Z" → "2026-05-24T10:30:00Z"
+  return date.toISOString().replace(/\.\d+Z$/, 'Z');
 }
 
 /**
