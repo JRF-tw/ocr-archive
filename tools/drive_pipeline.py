@@ -122,12 +122,12 @@ def _upload_file_entry(
 
 
 def _load_tagged_json(work_dir: Path) -> dict | None:
-    """Load merged_tagged.json or first tagged.json found in a chunk subdirectory."""
-    merged = work_dir / "merged_tagged.json"
-    if merged.exists():
-        with open(merged, encoding="utf-8") as f:
-            return json.load(f)
-    tagged_files = sorted(work_dir.glob("*/tagged.json"))
+    """Load merged_tagged.json or first tagged.json found anywhere under work_dir."""
+    for candidate in (work_dir / "merged_tagged.json", *sorted(work_dir.glob("**/merged_tagged.json"))):
+        if candidate.exists():
+            with open(candidate, encoding="utf-8") as f:
+                return json.load(f)
+    tagged_files = sorted(work_dir.glob("**/tagged.json"))
     if tagged_files:
         with open(tagged_files[0], encoding="utf-8") as f:
             return json.load(f)
@@ -387,7 +387,7 @@ def cmd_upload(args: argparse.Namespace) -> int:
     any_failed = False
 
     # --- 1. Upload bookmarked PDF ---
-    bm_files = sorted(work_dir.glob("*_bookmarked.pdf"))
+    bm_files = sorted(work_dir.glob("**/*_bookmarked.pdf"))
     any_failed |= _upload_file_entry(
         manifest, work_dir, drive,
         drive_manifest.BOOKMARKED_PDF,
@@ -397,16 +397,21 @@ def cmd_upload(args: argparse.Namespace) -> int:
     )
 
     # --- 2. Upload OCR markdown ---
-    ocr_path: Path | None = work_dir / "merged_ocr.md"
-    if not ocr_path.exists():
-        chunks = sorted(work_dir.glob("*/ocr_corrected.md"))
-        ocr_path = chunks[0] if chunks else None
+    ocr_path: Path | None = None
+    for _candidate in (
+        work_dir / "merged_ocr.md",
+        *sorted(work_dir.glob("**/merged_ocr.md")),
+        *sorted(work_dir.glob("**/ocr_corrected.md")),
+    ):
+        if _candidate.exists():
+            ocr_path = _candidate
+            break
     any_failed |= _upload_file_entry(
         manifest, work_dir, drive,
         drive_manifest.OCR_MARKDOWN,
         ocr_path,
         "text/markdown", sub_folder, force,
-        "No merged_ocr.md or */ocr_corrected.md found",
+        "No merged_ocr.md or **/ocr_corrected.md found",
     )
 
     # --- 3. Append CSV to Archive sheet ---
@@ -414,7 +419,7 @@ def cmd_upload(args: argparse.Namespace) -> int:
     if sr_status == "appended" and not force:
         pass  # skip
     else:
-        csv_files = sorted(work_dir.glob("*_sheet.csv"))
+        csv_files = sorted(work_dir.glob("**/*_sheet.csv"))
         if csv_files:
             csv_path = csv_files[0]
             try:
