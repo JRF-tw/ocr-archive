@@ -97,7 +97,12 @@ class GoogleDriveClient:
         mime_type: str | None = None,
         file_name: str | None = None,
     ) -> dict:
-        """Upload a local file to a Drive folder (always resumable)."""
+        """Upload a local file to a Drive folder.
+
+        Uses multipart (non-resumable) upload which works reliably with
+        Shared Drives. Resumable uploads on Shared Drives can silently
+        create orphaned files with no parent folder.
+        """
         if mime_type is None:
             mime_type, _ = mimetypes.guess_type(str(local_path))
             if mime_type is None:
@@ -106,7 +111,7 @@ class GoogleDriveClient:
             file_name = local_path.name
 
         file_metadata = {"name": file_name, "parents": [folder_id]}
-        media = MediaFileUpload(str(local_path), mimetype=mime_type, resumable=True)
+        media = MediaFileUpload(str(local_path), mimetype=mime_type, resumable=False)
         try:
             result = (
                 self.service.files()
