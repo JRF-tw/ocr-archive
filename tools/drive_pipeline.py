@@ -134,18 +134,30 @@ def _load_tagged_json(work_dir: Path) -> dict | None:
     return None
 
 
-def _run_ocr(pdf_path: Path) -> int:
-    """Run the OCR pipeline non-interactively via the claude CLI."""
+def _run_ocr(pdf_path: Path, max_retries: int = 3, retry_wait: int = 70) -> int:
+    """Run the OCR pipeline non-interactively via the claude CLI.
+
+    Retries up to max_retries times with retry_wait second delay to recover
+    from transient API rate-limit errors (429).
+    """
     project_root = Path(__file__).parent.parent
-    result = subprocess.run(
-        [
-            "claude",
-            "-p",
-            f"/ocr-legal-pdf {pdf_path}",
-            "--dangerously-skip-permissions",
-        ],
-        cwd=str(project_root),
-    )
+    cmd = [
+        "claude",
+        "-p",
+        f"/ocr-legal-pdf {pdf_path}",
+        "--dangerously-skip-permissions",
+    ]
+    for attempt in range(1, max_retries + 1):
+        result = subprocess.run(cmd, cwd=str(project_root))
+        if result.returncode == 0:
+            return 0
+        if attempt < max_retries:
+            print(
+                f"  OCR attempt {attempt}/{max_retries} failed (exit {result.returncode}),"
+                f" retrying in {retry_wait}s ..."
+            )
+            sys.stdout.flush()
+            time.sleep(retry_wait)
     return result.returncode
 
 
