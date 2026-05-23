@@ -140,6 +140,17 @@ function toRfc3339(date) {
 }
 
 /**
+ * One-time utility: delete LAST_CHECKED_TIMESTAMP from Script Properties.
+ * Run this once from the Apps Script editor after deploying updated code
+ * if the stored value is in the old Python ISO format (e.g. 2026-05-23T15:07:52.533937+00:00).
+ * After running, the next checkForNewPdfs execution will scan all PDFs from scratch.
+ */
+function clearLastCheckedTimestamp() {
+  PropertiesService.getScriptProperties().deleteProperty("LAST_CHECKED_TIMESTAMP");
+  Logger.log("LAST_CHECKED_TIMESTAMP cleared. Next run will scan all PDFs.");
+}
+
+/**
  * Append a pending row to the Queue sheet for a new PDF file.
  * @param {GoogleAppsScript.Spreadsheet.Sheet} sheet
  * @param {GoogleAppsScript.Drive.File} file
