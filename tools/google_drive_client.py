@@ -64,7 +64,7 @@ class GoogleDriveClient:
                 self.service.files()
                 .get(
                     fileId=file_id,
-                    fields="id,name,mimeType,size,md5Checksum,modifiedTime,webViewLink",
+                    fields="id,name,mimeType,size,md5Checksum,modifiedTime,webViewLink,parents",
                     supportsAllDrives=True,
                 )
                 .execute()

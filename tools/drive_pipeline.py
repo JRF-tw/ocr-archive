@@ -330,11 +330,21 @@ def cmd_watch(args: argparse.Namespace) -> int:
                 any_failed = True
                 continue
 
-            try:
-                drive.trash_file(fid)
-                print(f"  已從 INPUT 移除：{fname}")
-            except Exception as e:
-                print(f"  WARNING: 無法移除 INPUT 檔案：{e}", file=sys.stderr)
+            manifest_state = drive_manifest.load(work_dir)
+            recorded_folder = manifest_state.get("input", {}).get("folder_id")
+            input_folder_id = config["input_folder_id"]
+            if recorded_folder and recorded_folder != input_folder_id:
+                print(
+                    f"  WARNING: 跳過刪除 {fname} — "
+                    f"父資料夾 {recorded_folder} 不是 INPUT ({input_folder_id})",
+                    file=sys.stderr,
+                )
+            else:
+                try:
+                    drive.trash_file(fid)
+                    print(f"  已從 INPUT 移除：{fname}")
+                except Exception as e:
+                    print(f"  WARNING: 無法移除 INPUT 檔案：{e}", file=sys.stderr)
 
             completed_ts = _utc_now_iso()
             print(f"  Completed: {completed_ts}")
