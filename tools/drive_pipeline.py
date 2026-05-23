@@ -449,21 +449,20 @@ def cmd_upload(args: argparse.Namespace) -> int:
 
                 # --- 4. Back-fill URL columns in one batch call ---
                 original_pdf_url = drive.get_share_url(file_id) if file_id else ""
-                bookmarked_url = manifest["uploads"][drive_manifest.BOOKMARKED_PDF].get("drive_url") or ""
-                ocr_url = manifest["uploads"][drive_manifest.OCR_MARKDOWN].get("drive_url") or ""
-
-                url_updates = []
-                for row_num in range(old_row_count + 1, old_row_count + 1 + rows_appended):
-                    url_updates.extend([
-                        {"range": f"{archive_tab}!N{row_num}", "values": [[original_pdf_url]]},
-                        {"range": f"{archive_tab}!O{row_num}", "values": [[ocr_url]]},
-                        {"range": f"{archive_tab}!P{row_num}", "values": [[bookmarked_url]]},
-                    ])
+                # Back-fill Drive連結 (column I in new single-row-per-PDF schema)
+                from tools.export_sheet import DRIVE_URL_COLUMN
+                url_updates = [
+                    {
+                        "range": f"{archive_tab}!{DRIVE_URL_COLUMN}{row_num}",
+                        "values": [[original_pdf_url]],
+                    }
+                    for row_num in range(old_row_count + 1, old_row_count + 1 + rows_appended)
+                ]
                 if url_updates:
                     try:
                         sheets.batch_update_cells(spreadsheet_id, url_updates)
                     except Exception as e:
-                        print(f"WARNING: Failed to back-fill URLs: {e}", file=sys.stderr)
+                        print(f"WARNING: Failed to back-fill Drive URL: {e}", file=sys.stderr)
 
             except Exception as e:
                 drive_manifest.mark_upload(

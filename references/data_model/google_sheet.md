@@ -1,52 +1,48 @@
 # Google Sheet — Archive Schema
 
-One row per document (corresponds to one entry in `tagged.json`).
+One row per PDF file (not per document). Multi-document PDFs have their
+fields merged into a single row.
 
 ## Columns
 
-| 欄位 | 型別 | 來源 | 說明 |
-|------|------|------|------|
-| 案號 | string | 手動 / `case_no` 正規化 | `106上訴3315` |
-| 卷別 | string / null | 手動 | `卷2`；若文件非來自特定卷則留空 |
-| 卷內序號 | int / null | `tagged.json id` | 在該卷中的流水號 |
-| 文件類型 | string | `doc_type` | `刑事準備一狀` |
-| 摘要 | string | `summary` | ≤50字一句話描述 |
-| 日期 | date / null | `date` | ISO 格式 `2018-03-21` |
-| 罪名 | string / null | `charge` | `貪污治罪條例` |
-| 被告 | string | `defendants` 逗號合併 | `李孝君` |
-| 辯護人 | string / null | `lawyers` 逗號合併 | `黃英哲,許樹依,王晟睿` |
-| 法官 | string / null | `judges` 逗號合併 | `林孟皇` |
-| 其他關係人 | string / null | `others` 逗號合併 | `郭金章,蔡美燕` |
-| 起始頁 | int | `start_page` | PDF 全域頁碼 |
-| 結束頁 | int | `end_page` | PDF 全域頁碼 |
-| 原始 PDF | url | 手動 | Google Drive 連結，指向原始 PDF |
-| OCR Google Doc | url | 自動產生 | 此份文件 OCR 內容轉出的 Google Doc |
-| 標注 PDF | url | 自動產生 | Google Drive 連結，帶書籤的 PDF |
-| 備註 | string / null | `notes` + 手動 | 自由文字 |
+| 欄 | 欄位 | 型別 | 來源 | 說明 |
+|----|------|------|------|------|
+| A | 案號 | string | `case_no` 正規化，或檔名 | `N005896`、`106上訴3315` |
+| B | 收件日期 | date / null | 信封文件日期，或首個非空日期 | ISO 格式 `2022-06-17` |
+| C | 文件日期 | string | 所有文件日期以 `；` 合併（去重） | `2022-06-17；2023-01-01` |
+| D | 文件類型 | string | 所有 `doc_type` 以 `、` 合併（去重） | `信封、手寫書信` |
+| E | 寄件人 | string | `defendants` + `others` 去重合併 | `陳文雄` |
+| F | 收件人 | string | 留空（schema 目前無此欄位） | — |
+| G | 摘要 | string | 各文件 `summary` 以換行合併 | — |
+| H | 疑似罪名 | string | 各文件 `charge` 以 `；` 合併（去重）| `貪污治罪條例` |
+| I | Drive連結 | url | 原始 PDF 的 Google Drive 連結（自動回填）| — |
+| J | 備註 | string | 各文件 `notes` 以換行合併 | OCR 品質說明等 |
 
 ## 來源對應
 
-`tagged.json` document → Google Sheet row 的欄位對應：
+`tagged.json` documents array → 單一 Google Sheet row：
 
 ```
-doc_type      → 文件類型
-summary       → 摘要
-date          → 日期
-charge        → 罪名
-defendants    → 被告（join with ","）
-lawyers       → 辯護人（join with ","）
-judges        → 法官（join with ","）
-others        → 其他關係人（join with ","）
-start_page    → 起始頁
-end_page      → 結束頁
-notes         → 備註（可附加手動補充）
+case_no (首個非空)           → 案號
+envelope date / first date   → 收件日期
+all dates joined "；"        → 文件日期
+all doc_types joined "、"    → 文件類型
+defendants + others joined  → 寄件人
+(empty)                     → 收件人
+all summaries joined "\n"   → 摘要
+all charges joined "；"     → 疑似罪名
+(back-filled by pipeline)   → Drive連結
+all notes joined "\n"       → 備註
 ```
-
-案號、卷別、原始 PDF、OCR Google Doc、標注 PDF 由人工或自動化腳本填入。
 
 ## 設計原則
 
-- **一行一份文件**：對應 `tagged.json` 的一個 document entry
-- **卷別可為空**：文件若來自獨立 PDF 而非某卷則留空
-- **人名以逗號分隔**：保留在單一儲存格以利人工閱讀；若需程式查詢可另建 sheet
-- **OCR Google Doc 粒度**：每份文件的頁段（`start_page` 到 `end_page`）獨立轉成一個 Google Doc
+- **一列一個 PDF**：無論 PDF 內有幾份文件，Archive 只佔一列
+- **多文件欄位合併**：摘要與備註以換行分隔，日期/類型/罪名以中文標點分隔
+- **Drive連結欄**：由 `drive_pipeline upload` 自動回填，不需手動填入
+- **收件人留空**：現有 tagged.json schema 未明確區分寄件人/收件人，可日後補充
+
+## 自動化流程
+
+1. `tools/export_sheet.py <tagged.json>` → 產生 `<stem>_sheet.csv`（一列，Drive連結空白）
+2. `tools/drive_pipeline upload <work_dir>` → 上傳 CSV 並回填 Drive連結（欄 I）

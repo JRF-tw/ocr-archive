@@ -1,13 +1,10 @@
 #!/usr/bin/env python3
-"""Export tagged.json to CSV for Google Sheets import.
+"""Export tagged.json to CSV for Google Sheets import — one row per PDF.
 
-Reads tagged.json (or merged_tagged.json) and writes a CSV matching the
-archive schema defined in references/data_model/google_sheet.md.
+Reads tagged.json (or merged_tagged.json) and writes a single-row CSV
+matching the archive schema (references/data_model/google_sheet.md).
 
-URL columns (原始 PDF, OCR Google Doc, 標注 PDF) are left empty for manual fill.
-
-Handles both old format (parties: [...]) and new format
-(defendants/lawyers/judges/others as separate arrays).
+The Drive連結 column is left empty; drive_pipeline upload back-fills it.
 
 Usage:
     python tools/export_sheet.py <tagged_json> [options]
@@ -15,7 +12,7 @@ Usage:
 Options:
     --case-no TEXT    案號 short form, e.g. "106上訴3315"
                       If omitted, derived from the first non-null case_no field
-    --volume TEXT     卷別, e.g. "卷2" (optional)
+    --volume TEXT     Kept for CLI compatibility; ignored in new single-row format
     --output PATH     Output CSV path (default: <stem>_sheet.csv)
 """
 
@@ -27,12 +24,20 @@ import sys
 from pathlib import Path
 
 COLUMNS = [
-    "案號", "卷別", "卷內序號", "文件類型", "摘要", "日期", "罪名",
-    "被告", "辯護人", "法官", "其他關係人",
-    "起始頁", "結束頁",
-    "原始 PDF", "OCR Google Doc", "標注 PDF",
+    "案號",
+    "收件日期",
+    "文件日期",
+    "文件類型",
+    "寄件人",
+    "收件人",
+    "摘要",
+    "疑似罪名",
+    "Drive連結",
     "備註",
 ]
+
+# Column letter for Drive連結 (used by drive_pipeline to back-fill the URL)
+DRIVE_URL_COLUMN = "I"
 
 
 def normalize_case_no(raw: str) -> str:
@@ -41,56 +46,84 @@ def normalize_case_no(raw: str) -> str:
     return f"{m.group(1)}{m.group(2)}{m.group(3)}" if m else raw
 
 
-def join(values: list) -> str:
-    return ",".join(v for v in (values or []) if v)
-
-
-def doc_to_row(doc: dict, case_no: str, volume: str) -> dict:
-    # Party fields — handle both old and new format
-    if "defendants" in doc:
-        defendants = join(doc.get("defendants") or [])
-        lawyers    = join(doc.get("lawyers") or [])
-        judges     = join(doc.get("judges") or [])
-        others     = join(doc.get("others") or [])
-    else:
-        # Old format: single parties list → put in 被告, leave others empty
-        defendants = join(doc.get("parties") or [])
-        lawyers = lawyers = judges = others = ""
-
-    return {
-        "案號":         case_no,
-        "卷別":         volume,
-        "卷內序號":     doc.get("id", ""),
-        "文件類型":     doc.get("doc_type") or "",
-        "摘要":         doc.get("summary") or "",
-        "日期":         doc.get("date") or "",
-        "罪名":         doc.get("charge") or "",
-        "被告":         defendants,
-        "辯護人":       lawyers,
-        "法官":         judges,
-        "其他關係人":   others,
-        "起始頁":       doc.get("start_page", ""),
-        "結束頁":       doc.get("end_page", ""),
-        "原始 PDF":     "",
-        "OCR Google Doc": "",
-        "標注 PDF":     "",
-        "備註":         doc.get("notes") or "",
-    }
+def _unique(items: list) -> list:
+    """Return items deduplicated, preserving order, dropping empty strings."""
+    seen: set = set()
+    out = []
+    for x in items:
+        if x and x not in seen:
+            out.append(x)
+            seen.add(x)
+    return out
 
 
 def derive_case_no(documents: list) -> str:
     for doc in documents:
         raw = doc.get("case_no")
         if raw:
-            return normalize_case_no(raw)
+            return normalize_case_no(str(raw))
     return ""
 
 
+def _receive_date(documents: list) -> str:
+    """Date of first envelope-type document, or first non-null date overall."""
+    envelope_types = {"信封", "收文信封", "掛號信封"}
+    for doc in documents:
+        if doc.get("doc_type") in envelope_types and doc.get("date"):
+            return doc["date"]
+    for doc in documents:
+        if doc.get("date"):
+            return doc["date"]
+    return ""
+
+
+def pdf_to_row(documents: list, case_no: str) -> dict:
+    """Collapse all documents in a PDF into a single Archive row."""
+    receive_date = _receive_date(documents)
+
+    all_dates = _unique([d.get("date") or "" for d in documents])
+    doc_dates = "；".join(all_dates)
+
+    types = _unique([d.get("doc_type") or "" for d in documents])
+    doc_types = "、".join(types)
+
+    people: list = []
+    for doc in documents:
+        if "defendants" in doc:
+            people += doc.get("defendants") or []
+            people += doc.get("others") or []
+        else:
+            people += doc.get("parties") or []
+    sender = "、".join(_unique(people))
+
+    summaries = [d.get("summary") or "" for d in documents if d.get("summary")]
+    summary = "\n".join(summaries)
+
+    charges = _unique([d.get("charge") or "" for d in documents if d.get("charge")])
+    charge = "；".join(charges)
+
+    notes_list = [d.get("notes") or "" for d in documents if d.get("notes")]
+    notes = "\n".join(notes_list)
+
+    return {
+        "案號":     case_no,
+        "收件日期": receive_date,
+        "文件日期": doc_dates,
+        "文件類型": doc_types,
+        "寄件人":   sender,
+        "收件人":   "",
+        "摘要":     summary,
+        "疑似罪名": charge,
+        "Drive連結": "",
+        "備註":     notes,
+    }
+
+
 def main():
-    parser = argparse.ArgumentParser(description="Export tagged.json to CSV for Google Sheets")
+    parser = argparse.ArgumentParser(description="Export tagged.json to single-row CSV for Google Sheets")
     parser.add_argument("tagged_json", help="Path to tagged.json or merged_tagged.json")
     parser.add_argument("--case-no", help="案號 short form, e.g. '106上訴3315'")
-    parser.add_argument("--volume", default="", help="卷別, e.g. '卷2'")
+    parser.add_argument("--volume", default="", help="(kept for compatibility, not used in new format)")
     parser.add_argument("--output", help="Output CSV path (default: <stem>_sheet.csv)")
     args = parser.parse_args()
 
@@ -111,13 +144,14 @@ def main():
     output_path = Path(args.output) if args.output \
         else json_path.parent / f"{json_path.stem}_sheet.csv"
 
+    row = pdf_to_row(documents, case_no)
+
     with output_path.open("w", newline="", encoding="utf-8-sig") as f:
         writer = csv.DictWriter(f, fieldnames=COLUMNS)
         writer.writeheader()
-        for doc in documents:
-            writer.writerow(doc_to_row(doc, case_no, args.volume))
+        writer.writerow(row)
 
-    print(f"Exported {len(documents)} rows → {output_path}")
+    print(f"Exported 1 row → {output_path}")
     if not args.case_no and case_no:
         print(f"  案號 derived: {case_no}")
 
