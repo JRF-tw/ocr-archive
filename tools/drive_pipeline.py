@@ -310,6 +310,12 @@ def cmd_watch(args: argparse.Namespace) -> int:
                 any_failed = True
                 continue
 
+            try:
+                drive.trash_file(fid)
+                print(f"  已從 INPUT 移除：{fname}")
+            except Exception as e:
+                print(f"  WARNING: 無法移除 INPUT 檔案：{e}", file=sys.stderr)
+
             completed_ts = _utc_now_iso()
             print(f"  Completed: {completed_ts}")
             print(f"{'=' * 60}")

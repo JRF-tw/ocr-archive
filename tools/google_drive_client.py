@@ -164,6 +164,17 @@ class GoogleDriveClient:
                 f"Failed to find or create folder '{name}' under {parent_folder_id}: {e}"
             ) from e
 
+    def trash_file(self, file_id: str) -> None:
+        """Move a file to the Drive trash (recoverable)."""
+        try:
+            self.service.files().update(
+                fileId=file_id,
+                body={"trashed": True},
+                supportsAllDrives=True,
+            ).execute()
+        except HttpError as e:
+            raise RuntimeError(f"Failed to trash file {file_id}: {e}") from e
+
     def get_share_url(self, file_id: str) -> str:
         return f"https://drive.google.com/file/d/{file_id}/view"
 
