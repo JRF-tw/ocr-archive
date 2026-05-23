@@ -1,0 +1,43 @@
+{
+  "source": "ocr_corrected.md",
+  "documents": [
+    {
+      "id": 1,
+      "start_page": 1,
+      "end_page": 2,
+      "doc_type": "信封",
+      "court": null,
+      "case_no": "N005896",
+      "date": "2022-06-17",
+      "sender": "陳文雄",
+      "recipient": "財團法人民間司法改革基金會",
+      "defendants": [],
+      "lawyers": [],
+      "judges": [],
+      "others": ["陳文雄"],
+      "charge": null,
+      "tags": ["掛號信封", "陳文雄", "寄件人"],
+      "summary": "陳文雄寄往財團法人民間司法改革基金會之掛號郵件信封，收發室戳記日期2022年6月17日。",
+      "notes": "OCR 第1頁收件人辨識為「臺灣高等法院行政庭主任法官」，但依原始 Drive 內容片段及本案件歸檔背景，收件人應為民間司法改革基金會；另收發章年份 OCR 為112，依檔名應為111（2022年），疑 OCR 誤讀。第2頁為信封背面郵遞區號表及掛號條碼。"
+    },
+    {
+      "id": 2,
+      "start_page": 3,
+      "end_page": 3,
+      "doc_type": "手寫書信",
+      "court": null,
+      "case_no": null,
+      "date": null,
+      "sender": "陳文雄",
+      "recipient": "財團法人民間司法改革基金會",
+      "defendants": ["陳文雄"],
+      "lawyers": [],
+      "judges": [],
+      "others": [],
+      "charge": null,
+      "tags": ["陳情書", "手寫", "求助"],
+      "summary": "陳文雄以手寫書信向民間司法改革基金會律師陳情，自述遭判刑，請求協助，文字因手寫辨識困難多處模糊。",
+      "notes": "全頁手寫，字跡潦草，OCR 品質偏低，QA 標記多處疑似錯誤。身份證字號及出生日期 OCR 辨識與原始文件有落差（原始應為 T120258492、出生日期 57.6.12）。疑似毒品案件但罪名無法從現有 OCR 確認。"
+    }
+  ]
+}

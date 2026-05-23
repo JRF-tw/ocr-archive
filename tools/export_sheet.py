@@ -87,14 +87,20 @@ def pdf_to_row(documents: list, case_no: str) -> dict:
     types = _unique([d.get("doc_type") or "" for d in documents])
     doc_types = "、".join(types)
 
-    people: list = []
-    for doc in documents:
-        if "defendants" in doc:
-            people += doc.get("defendants") or []
-            people += doc.get("others") or []
-        else:
-            people += doc.get("parties") or []
-    sender = "、".join(_unique(people))
+    # Prefer explicit sender/recipient fields; fall back to defendants+others for sender
+    if any("sender" in d for d in documents):
+        sender = "、".join(_unique([d.get("sender") or "" for d in documents if d.get("sender")]))
+    else:
+        people: list = []
+        for doc in documents:
+            if "defendants" in doc:
+                people += doc.get("defendants") or []
+                people += doc.get("others") or []
+            else:
+                people += doc.get("parties") or []
+        sender = "、".join(_unique(people))
+
+    recipient = "、".join(_unique([d.get("recipient") or "" for d in documents if d.get("recipient")]))
 
     summaries = [d.get("summary") or "" for d in documents if d.get("summary")]
     summary = "\n".join(summaries)
@@ -111,7 +117,7 @@ def pdf_to_row(documents: list, case_no: str) -> dict:
         "文件日期": doc_dates,
         "文件類型": doc_types,
         "寄件人":   sender,
-        "收件人":   "",
+        "收件人":   recipient,
         "摘要":     summary,
         "疑似罪名": charge,
         "Drive連結": "",

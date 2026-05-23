@@ -1,0 +1,43 @@
+{
+  "source": "ocr_corrected.md",
+  "documents": [
+    {
+      "id": 1,
+      "start_page": 1,
+      "end_page": 2,
+      "doc_type": "其他",
+      "court": null,
+      "case_no": null,
+      "date": "2022-05-17",
+      "sender": "丁明昌",
+      "recipient": "呂政諦",
+      "defendants": [],
+      "lawyers": ["呂政諦"],
+      "judges": [],
+      "others": ["丁明昌"],
+      "charge": null,
+      "tags": ["信封", "郵件", "民間司法改革基金會", "陳情"],
+      "summary": "丁明昌寄往財團法人民間司法改革基金會之掛號郵件信封，收件人為法律政策部副主任呂政諦律師，收發室戳記日期2022年5月17日。",
+      "notes": "第2頁為信封背面及掛號收據聯，僅有郵票資訊，無其他文字內容。"
+    },
+    {
+      "id": 2,
+      "start_page": 3,
+      "end_page": 4,
+      "doc_type": "其他",
+      "court": null,
+      "case_no": null,
+      "date": null,
+      "sender": "丁明昌",
+      "recipient": "財團法人民間司法改革基金會",
+      "defendants": ["丁明昌"],
+      "lawyers": [],
+      "judges": [],
+      "others": [],
+      "charge": "毒品危害防制條例第4條第1項販賣罪",
+      "tags": ["手寫書信", "陳情", "毒品", "拘押"],
+      "summary": "丁明昌以手寫書信向財團法人民間司法改革基金會陳情，述及遭逮捕獲釋經過及財物訴求，自述涉嫌販賣毒品案。",
+      "notes": "手寫藍墨水直書，格稿紙，多處文字模糊難辨；罪名係依OCR推測，標記為疑似，非確認。"
+    }
+  ]
+}

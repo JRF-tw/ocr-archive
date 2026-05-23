@@ -35,6 +35,8 @@ Structured metadata per document. One file per chunk (`tagged.json`); merged int
 | `court` | string / null | 發文法院或機關全稱 |
 | `case_no` | string / null | 年度字號，如 `106年度上訴字第3315號` |
 | `date` | ISO date / null | 文件日期；chunk 中段無法確認時為 null |
+| `sender` | string / null | 寄件人或發文機關；信封取寄件人，函文取發文機關，無法判斷則 null |
+| `recipient` | string / null | 收件人或受文機關；信封取收件人，函文取受文者，無法判斷則 null |
 | `defendants` | string[] | 明確標示為「被告」者 |
 | `lawyers` | string[] | 選任辯護人、公設辯護人（姓名，不含「律師」稱謂） |
 | `judges` | string[] | 審判長、受命法官、陪席法官（姓名，不含職稱） |

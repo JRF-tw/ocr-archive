@@ -1,0 +1,43 @@
+{
+  "source": "ocr_corrected.md",
+  "documents": [
+    {
+      "id": 1,
+      "start_page": 1,
+      "end_page": 1,
+      "doc_type": "其他",
+      "court": "臺灣高雄地方法院",
+      "case_no": null,
+      "date": "2023-12-13",
+      "sender": "臺灣高雄地方法院",
+      "recipient": "喬政翔",
+      "defendants": [],
+      "lawyers": [],
+      "judges": [],
+      "others": ["喬政翔"],
+      "charge": null,
+      "tags": ["信封", "高雄地院", "收文章"],
+      "summary": "臺灣高雄地方法院2023年12月13日收文信封，收件人為台北市喬政翔",
+      "notes": "郵遞區號疑似OCR錯誤（104 56，應為10456）"
+    },
+    {
+      "id": 2,
+      "start_page": 2,
+      "end_page": 2,
+      "doc_type": "起訴書",
+      "court": "臺灣高雄地方法院",
+      "case_no": null,
+      "date": "2023-12-13",
+      "sender": "喬政翔",
+      "recipient": "陳毓賢",
+      "defendants": ["陳毓賢"],
+      "lawyers": [],
+      "judges": [],
+      "others": ["喬政翔"],
+      "charge": null,
+      "tags": ["民事", "起訴", "移轉登記", "借款抵償"],
+      "summary": "喬政翔起訴陳毓賢，請求將高雄市大寮區土地移轉登記以清償借款，民國112年12月13日",
+      "notes": "手寫直書，字跡模糊，多處[?]無法辨識"
+    }
+  ]
+}
