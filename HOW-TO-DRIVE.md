@@ -86,6 +86,61 @@ python -m tools.drive_pipeline watch
 
 ---
 
+## 如何設定自動排程（macOS LaunchAgent）
+
+不需要手動開終端機——設定完成後，電腦每 5 分鐘會自動檢查 Queue 並處理待辦工作。
+
+### 安裝步驟
+
+**1. 複製 plist 範本並填入你的資訊**
+
+```bash
+cp launchagent/tw.jrf.ocr-pipeline.plist \
+   ~/Library/LaunchAgents/tw.jrf.ocr-pipeline.plist
+```
+
+用文字編輯器開啟 `~/Library/LaunchAgents/tw.jrf.ocr-pipeline.plist`，替換以下兩個佔位符：
+
+| 佔位符 | 替換為 |
+|--------|--------|
+| `YOUR_USERNAME` | 你的 macOS 使用者名稱（執行 `whoami` 可查詢） |
+| `YOUR_ANTHROPIC_API_KEY` | 你的 Anthropic API Key（`sk-ant-api03-...`） |
+
+**2. 建立 log 目錄**
+
+```bash
+mkdir -p ~/ocr-archive/logs
+```
+
+**3. 載入 LaunchAgent**
+
+```bash
+launchctl load ~/Library/LaunchAgents/tw.jrf.ocr-pipeline.plist
+```
+
+確認已載入（顯示 `tw.jrf.ocr-pipeline` 即成功）：
+
+```bash
+launchctl list | grep tw.jrf.ocr-pipeline
+```
+
+### 管理指令
+
+| 目的 | 指令 |
+|------|------|
+| 立即手動觸發一次 | `launchctl start tw.jrf.ocr-pipeline` |
+| 停用自動排程 | `launchctl unload ~/Library/LaunchAgents/tw.jrf.ocr-pipeline.plist` |
+| 重新啟用 | `launchctl load ~/Library/LaunchAgents/tw.jrf.ocr-pipeline.plist` |
+| 查看最近 log | `tail -f ~/ocr-archive/logs/pipeline.log` |
+
+### 注意事項
+
+- LaunchAgent 會在你**登入後**啟動、**登出後**停止；機器關機時不執行
+- Queue 頁籤沒有 `pending` 工作時，每次執行只會印出「No pending jobs.」並結束，不佔資源
+- API Key 只寫在本機的 `~/Library/LaunchAgents/` 目錄下，**不會**被 git 追蹤
+
+---
+
 ## 如何查看某個工作目錄的上傳狀態
 
 ```bash
