@@ -42,6 +42,12 @@ function checkForNewPdfs() {
   var lastChecked = props.getProperty("LAST_CHECKED_TIMESTAMP");
   var searchStart = new Date();
 
+  // Sanitize: old values may have been stored as ISO with milliseconds (.000Z).
+  // Drive query requires RFC 3339 without milliseconds (e.g. 2024-01-15T10:30:00Z).
+  if (lastChecked) {
+    lastChecked = toRfc3339(new Date(lastChecked));
+  }
+
   var files;
   if (lastChecked) {
     // Search for PDFs modified after last check
@@ -64,8 +70,8 @@ function checkForNewPdfs() {
     enqueued++;
   }
 
-  // Update last-checked timestamp
-  props.setProperty("LAST_CHECKED_TIMESTAMP", searchStart.toISOString());
+  // Update last-checked timestamp in RFC 3339 format (no milliseconds)
+  props.setProperty("LAST_CHECKED_TIMESTAMP", toRfc3339(searchStart));
   Logger.log("Enqueued " + enqueued + " new PDF(s).");
 }
 
@@ -120,6 +126,17 @@ function isAlreadyQueued(sheet, fileId) {
     }
   }
   return false;
+}
+
+/**
+ * Format a Date as RFC 3339 UTC string without milliseconds,
+ * e.g. "2024-01-15T10:30:00Z". Drive query strings require this format;
+ * toISOString() produces milliseconds (.000Z) which Drive rejects.
+ * @param {Date} date
+ * @returns {string}
+ */
+function toRfc3339(date) {
+  return Utilities.formatDate(date, 'UTC', "yyyy-MM-dd'T'HH:mm:ss'Z'");
 }
 
 /**
