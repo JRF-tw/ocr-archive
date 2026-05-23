@@ -42,6 +42,8 @@ class GoogleDriveClient:
                         q=q,
                         fields="nextPageToken, files(id, name, modifiedTime, md5Checksum)",
                         pageToken=page_token,
+                        supportsAllDrives=True,
+                        includeItemsFromAllDrives=True,
                     )
                     .execute()
                 )
@@ -63,6 +65,7 @@ class GoogleDriveClient:
                 .get(
                     fileId=file_id,
                     fields="id,name,mimeType,size,md5Checksum,modifiedTime,webViewLink",
+                    supportsAllDrives=True,
                 )
                 .execute()
             )
@@ -74,7 +77,7 @@ class GoogleDriveClient:
     def download_file(self, file_id: str, dest_path: Path) -> Path:
         """Download a file from Drive to a local path."""
         try:
-            request = self.service.files().get_media(fileId=file_id)
+            request = self.service.files().get_media(fileId=file_id, supportsAllDrives=True)
             dest_path.parent.mkdir(parents=True, exist_ok=True)
             with open(dest_path, "wb") as fh:
                 downloader = MediaIoBaseDownload(fh, request, chunksize=10 * 1024 * 1024)
@@ -111,6 +114,7 @@ class GoogleDriveClient:
                     body=file_metadata,
                     media_body=media,
                     fields="id, name, webViewLink",
+                    supportsAllDrives=True,
                 )
                 .execute()
             )
@@ -131,7 +135,13 @@ class GoogleDriveClient:
         try:
             resp = (
                 self.service.files()
-                .list(q=q, fields="files(id)", pageSize=1)
+                .list(
+                    q=q,
+                    fields="files(id)",
+                    pageSize=1,
+                    supportsAllDrives=True,
+                    includeItemsFromAllDrives=True,
+                )
                 .execute()
             )
             files = resp.get("files", [])
@@ -145,7 +155,7 @@ class GoogleDriveClient:
             }
             folder = (
                 self.service.files()
-                .create(body=folder_metadata, fields="id")
+                .create(body=folder_metadata, fields="id", supportsAllDrives=True)
                 .execute()
             )
             return folder["id"]

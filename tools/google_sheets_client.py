@@ -152,7 +152,7 @@ class GoogleSheetsClient:
                 spreadsheetId=spreadsheet_id,
                 range=f"{tab_name}!A1",
                 valueInputOption="RAW",
-                insertDataOption="INSERT_ROWS",
+                insertDataOption="OVERWRITE",
                 body={"values": data_rows},
             ).execute()
             return len(data_rows)
