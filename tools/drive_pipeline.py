@@ -272,6 +272,14 @@ def cmd_watch(args: argparse.Namespace) -> int:
             time.sleep(args.interval)
             continue
 
+        if not pending:
+            print(f"[{_utc_now_iso()}] No pending jobs.")
+            sys.stdout.flush()
+            if args.once:
+                return 0
+            time.sleep(args.interval)
+            continue
+
         any_failed = False
         for job in pending:
             fid = job.get("file_id")
