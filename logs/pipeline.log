@@ -1095,3 +1095,13 @@ ERROR: Failed to poll queue: 'GoogleSheetsClient' object has no attribute 'get_f
 [2026-05-25T13:07:25.902349+00:00] No pending jobs.
 [2026-05-25T13:08:29.100736+00:00] No pending jobs.
 [2026-05-25T13:09:32.521045+00:00] No pending jobs.
+[2026-05-25T13:10:36.089672+00:00] No pending jobs.
+[2026-05-25T13:11:39.500724+00:00] No pending jobs.
+[2026-05-25T13:12:42.908642+00:00] No pending jobs.
+[2026-05-25T13:15:07.031595+00:00] No pending jobs.
+WARNING: Could not ensure Queue tab headers: Unable to find the server at sheets.googleapis.com
+[2026-05-25T13:41:39.121471+00:00] No pending jobs.
+[2026-05-25T13:57:01.137308+00:00] No pending jobs.
+[2026-05-25T13:58:04.493632+00:00] No pending jobs.
+[2026-05-25T13:59:07.818888+00:00] No pending jobs.
+[2026-05-25T14:00:11.318602+00:00] No pending jobs.
