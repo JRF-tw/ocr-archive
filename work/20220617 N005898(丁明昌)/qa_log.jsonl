@@ -1,0 +1,10 @@
+{"chunk": "chunk_001-004", "page": 1, "type": "flag", "original": "582/", "corrected": null, "confidence": "low", "note": "寄件人欄末行出現 582/，疑為號碼或標籤殘字，原文用途不明，可能為郵遞區號或批次號碼片段"}
+{"chunk": "chunk_001-004", "page": 2, "type": "flag", "original": "大家團結委員 [?]", "corrected": null, "confidence": "low", "note": "條碼貼紙說明文字語意完全不通，疑為嚴重誤讀，原文可能為寄件單位或郵務說明文字"}
+{"chunk": "chunk_001-004", "page": 2, "type": "flag", "original": "U1上", "corrected": null, "confidence": "low", "note": "機構橡皮戳殘字，疑為地方法院或機構代碼，掃描品質不佳導致無法辨識"}
+{"chunk": "chunk_001-004", "page": 3, "type": "flag", "original": "政黨金合錄表 [?]", "corrected": null, "confidence": "low", "note": "書信標題或稱謂嚴重誤讀，語意完全不通，手寫字潦草導致無法正確辨識"}
+{"chunk": "chunk_001-004", "page": 3, "type": "flag", "original": "款刑申", "corrected": null, "confidence": "low", "note": "行首三字語意不通，疑為書信開頭稱謂或說明文字誤讀，原文難以還原"}
+{"chunk": "chunk_001-004", "page": 3, "type": "flag", "original": "農業金合", "corrected": null, "confidence": "low", "note": "疑為機構名稱誤讀，可能為農業金庫、農漁會、或其他農業金融機構，同頁出現兩次"}
+{"chunk": "chunk_001-004", "page": 4, "type": "flag", "original": "完善到規伸第 4 條第 1 項之四到", "corrected": null, "confidence": "low", "note": "法條格式破碎，「完善到規伸」語意不通，疑為刑事法條（如毒品危害防制條例）之嚴重誤讀，書寫潦草所致"}
+{"chunk": "chunk_001-004", "page": 4, "type": "flag", "original": "完善到 [?] 規定第 4 條第 1 項第 [?] 款到", "corrected": null, "confidence": "low", "note": "同上，法條格式破碎，與上一行為同一法條重複陳述，均無法還原正確條文名稱"}
+{"chunk": "chunk_001-004", "page": 4, "type": "flag", "original": "漢準 [?]", "corrected": null, "confidence": "low", "note": "疑為人名誤讀，位於感謝語後方，可能為司法改革基金會組長姓名"}
+{"chunk": "chunk_001-004", "page": 4, "type": "flag", "original": "惠民 [?]", "corrected": null, "confidence": "low", "note": "書信稱謂疑似誤讀，手寫字難辨，原字可能為其他稱謂或敬語"}

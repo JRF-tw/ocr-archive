@@ -1,0 +1,10 @@
+{
+  "pdf": "20220617 N005898(丁明昌).pdf",
+  "pdf_path": "/Users/lc/ocr-archive/work/20220617 N005898(丁明昌)/20220617 N005898(丁明昌).pdf",
+  "total_pages": 4,
+  "chunk_size": 50,
+  "chunks": [
+    {"id": "chunk_001-004", "start": 1, "end": 4, "status": "done"}
+  ],
+  "pipeline_step": "complete"
+}

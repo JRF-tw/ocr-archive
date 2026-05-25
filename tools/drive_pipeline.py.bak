@@ -266,17 +266,6 @@ def cmd_watch(args: argparse.Namespace) -> int:
     while True:
         try:
             pending = sheets.get_pending_jobs(spreadsheet_id, queue_tab)
-            # Auto-retry failed jobs (up to 3 times)
-            failed = sheets.get_failed_jobs(spreadsheet_id, queue_tab)
-            for job in failed:
-                retry_count = int(job.get("error", "").count("auto-retry") )
-                if retry_count < 3:
-                    fid = job.get("file_id")
-                    if fid:
-                        error_msg = job.get("error", "")
-                        new_error = error_msg + f" [auto-retry {retry_count+1}/3]"
-                        sheets.update_job_status(spreadsheet_id, queue_tab, fid, "pending", error=new_error)
-                        print(f"  Auto-retrying: {job.get('file_name')} (attempt {retry_count+1}/3)")
         except Exception as e:
             print(f"ERROR: Failed to poll queue: {e}", file=sys.stderr)
             if args.once:
@@ -345,41 +334,18 @@ def cmd_watch(args: argparse.Namespace) -> int:
             manifest_state = drive_manifest.load(work_dir)
             recorded_folder = manifest_state.get("input", {}).get("folder_id")
             input_folder_id = config["input_folder_id"]
-            # Allow deletion if file is in INPUT or any subfolder of INPUT
-            def is_in_input_folder(folder_id, root_id):
-                if folder_id == root_id:
-                    return True
-                try:
-                    folder = drive.service.files().get(
-                        fileId=folder_id, fields="parents"
-                    ).execute()
-                    parents = folder.get("parents", [])
-                    for parent in parents:
-                        if is_in_input_folder(parent, root_id):
-                            return True
-                except Exception:
-                    pass
-                return False
-
-            if recorded_folder and not is_in_input_folder(recorded_folder, input_folder_id):
+            if recorded_folder and recorded_folder != input_folder_id:
                 print(
                     f"  WARNING: 跳過刪除 {fname} — "
-                    f"父資料夾 {recorded_folder} 不在 INPUT 底下 ({input_folder_id})",
+                    f"父資料夾 {recorded_folder} 不是 INPUT ({input_folder_id})",
                     file=sys.stderr,
                 )
             else:
-                for _attempt in range(3):
-                    try:
-                        time.sleep(2)
-                        drive.trash_file(fid)
-                        print(f"  已從 INPUT 移除：{fname}")
-                        break
-                    except Exception as e:
-                        if _attempt < 2:
-                            print(f"  WARNING: 刪除失敗，重試中... ({_attempt+1}/3)", file=sys.stderr)
-                            time.sleep(5)
-                        else:
-                            print(f"  WARNING: 無法移除 INPUT 檔案：{e}", file=sys.stderr)
+                try:
+                    drive.trash_file(fid)
+                    print(f"  已從 INPUT 移除：{fname}")
+                except Exception as e:
+                    print(f"  WARNING: 無法移除 INPUT 檔案：{e}", file=sys.stderr)
 
             completed_ts = _utc_now_iso()
             print(f"  Completed: {completed_ts}")
@@ -501,6 +467,7 @@ def cmd_upload(args: argparse.Namespace) -> int:
 
                 # --- 4. Back-fill URL columns in one batch call ---
                 original_pdf_url = drive.get_share_url(file_id) if file_id else ""
+                # Back-fill Drive連結 (column I in new single-row-per-PDF schema)
                 from tools.export_sheet import DRIVE_URL_COLUMN
                 url_updates = [
                     {
@@ -598,6 +565,7 @@ def _build_parser() -> argparse.ArgumentParser:
         description="Google Drive pipeline CLI for the JRF OCR workflow",
     )
 
+    # Global flags
     parser.add_argument(
         "--config-path",
         default=str(Path.home() / ".jrf" / "drive_config.json"),
@@ -622,10 +590,12 @@ def _build_parser() -> argparse.ArgumentParser:
 
     subs = parser.add_subparsers(dest="command", required=True)
 
+    # run
     p_run = subs.add_parser("run", help="Download a PDF by file ID")
     p_run.add_argument("file_id", help="Google Drive file ID")
     p_run.set_defaults(func=cmd_run)
 
+    # watch
     p_watch = subs.add_parser("watch", help="Poll Queue sheet for pending jobs")
     p_watch.add_argument(
         "--once", action="store_true",
@@ -637,6 +607,7 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     p_watch.set_defaults(func=cmd_watch)
 
+    # upload
     p_upload = subs.add_parser("upload", help="Upload pipeline outputs to Drive")
     p_upload.add_argument("work_dir", help="Path to work directory")
     p_upload.add_argument(
@@ -645,6 +616,7 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     p_upload.set_defaults(func=cmd_upload)
 
+    # status
     p_status = subs.add_parser("status", help="Print manifest status table")
     p_status.add_argument("work_dir", help="Path to work directory")
     p_status.set_defaults(func=cmd_status)

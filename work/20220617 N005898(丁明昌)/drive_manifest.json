@@ -1,0 +1,43 @@
+{
+  "_schema_version": "1",
+  "input": {
+    "file_id": "1Q3oIdOg4_izZd1sFeOuqj1X81GnUA7LP",
+    "file_name": "20220617 N005898(丁明昌).pdf",
+    "folder_id": null,
+    "downloaded_at": "2026-05-22T08:09:40.317527+00:00",
+    "local_pdf_path": "work/20220617 N005898(丁明昌)/20220617 N005898(丁明昌).pdf",
+    "md5_checksum": "139003b127e83e0372c8df7275f86c22"
+  },
+  "output_folder_id": "13z7BQNwJ1Yw_buM_O7m5cKCiD6jaREQm",
+  "pipeline_status": "complete",
+  "uploads": {
+    "bookmarked_pdf": {
+      "status": "uploaded",
+      "local_path": "/Users/lc/ocr-archive/work/20220617 N005898(丁明昌)/20220617 N005898(丁明昌)_bookmarked.pdf",
+      "drive_file_id": "10rFcPWKSQ_l4sEq9xlZGnenYmhdEjocx",
+      "drive_url": "https://drive.google.com/file/d/10rFcPWKSQ_l4sEq9xlZGnenYmhdEjocx/view",
+      "uploaded_at": "2026-05-23T14:17:30.993362+00:00",
+      "error": null
+    },
+    "ocr_markdown": {
+      "status": "uploaded",
+      "local_path": "/Users/lc/ocr-archive/work/20220617 N005898(丁明昌)/chunk_001-004/ocr_corrected.md",
+      "drive_file_id": "1RxoRoCcRQgpA9CjAGewfpevWd5Tga2NT",
+      "drive_url": "https://drive.google.com/file/d/1RxoRoCcRQgpA9CjAGewfpevWd5Tga2NT/view",
+      "uploaded_at": "2026-05-23T14:17:33.011444+00:00",
+      "error": null
+    },
+    "sheet_rows": {
+      "status": "appended",
+      "local_csv_path": "/Users/lc/ocr-archive/work/20220617 N005898(丁明昌)/20220617 N005898(丁明昌)_sheet.csv",
+      "spreadsheet_id": "1ZNJjoYUeYbfLm4D1vlGUpey5jGCofkSGHFOPTeFNjd4",
+      "spreadsheet_url": "https://docs.google.com/spreadsheets/d/1ZNJjoYUeYbfLm4D1vlGUpey5jGCofkSGHFOPTeFNjd4/edit",
+      "tab_name": "Archive",
+      "rows_appended": 1,
+      "appended_at": "2026-05-23T14:17:34.588993+00:00",
+      "error": null
+    }
+  },
+  "created_at": "2026-05-22T06:55:11.609115+00:00",
+  "updated_at": "2026-05-23T14:17:35.036309+00:00"
+}

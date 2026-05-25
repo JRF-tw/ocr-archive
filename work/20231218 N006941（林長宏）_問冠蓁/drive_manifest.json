@@ -1,0 +1,43 @@
+{
+  "_schema_version": "1",
+  "input": {
+    "file_id": "1qXna13CUZw0Wom-qRYHaVke5uVWX9raD",
+    "file_name": "20231218 N006941（林長宏）_問冠蓁.pdf",
+    "folder_id": "1zt6KC7JmK_5-fy7TF6QI2u_wEO7ZtunT",
+    "downloaded_at": "2026-05-24T08:10:47.579735+00:00",
+    "local_pdf_path": "work/20231218 N006941（林長宏）_問冠蓁/20231218 N006941（林長宏）_問冠蓁.pdf",
+    "md5_checksum": "a32dfe4b68fd81d8c6cb03b9de966a03"
+  },
+  "output_folder_id": "1fCc-tOywTEhDIC8tGPBl243xF8dPXPo-",
+  "pipeline_status": "complete",
+  "uploads": {
+    "bookmarked_pdf": {
+      "status": "uploaded",
+      "local_path": "/Users/lc/ocr-archive/work/20231218 N006941（林長宏）_問冠蓁/20231218 N006941（林長宏）_問冠蓁/20231218 N006941（林長宏）_問冠蓁_bookmarked.pdf",
+      "drive_file_id": "1Wpax0EgffKrBz3Hl5ns5nMFSrnqVGQUl",
+      "drive_url": "https://drive.google.com/file/d/1Wpax0EgffKrBz3Hl5ns5nMFSrnqVGQUl/view",
+      "uploaded_at": "2026-05-24T08:24:52.534727+00:00",
+      "error": null
+    },
+    "ocr_markdown": {
+      "status": "uploaded",
+      "local_path": "/Users/lc/ocr-archive/work/20231218 N006941（林長宏）_問冠蓁/20231218 N006941（林長宏）_問冠蓁/chunk_001-002/ocr_corrected.md",
+      "drive_file_id": "19FlvUIEGWImpQWNiOqBqvdaqgmXvYnnC",
+      "drive_url": "https://drive.google.com/file/d/19FlvUIEGWImpQWNiOqBqvdaqgmXvYnnC/view",
+      "uploaded_at": "2026-05-24T08:24:54.488213+00:00",
+      "error": null
+    },
+    "sheet_rows": {
+      "status": "appended",
+      "local_csv_path": "/Users/lc/ocr-archive/work/20231218 N006941（林長宏）_問冠蓁/20231218 N006941（林長宏）_問冠蓁/20231218 N006941（林長宏）_問冠蓁_sheet.csv",
+      "spreadsheet_id": "1ZNJjoYUeYbfLm4D1vlGUpey5jGCofkSGHFOPTeFNjd4",
+      "spreadsheet_url": "https://docs.google.com/spreadsheets/d/1ZNJjoYUeYbfLm4D1vlGUpey5jGCofkSGHFOPTeFNjd4/edit",
+      "tab_name": "Archive",
+      "rows_appended": 1,
+      "appended_at": "2026-05-24T08:24:56.434102+00:00",
+      "error": null
+    }
+  },
+  "created_at": "2026-05-24T08:10:45.745864+00:00",
+  "updated_at": "2026-05-24T08:24:56.794694+00:00"
+}

@@ -1,0 +1,43 @@
+{
+  "source": "ocr_corrected.md",
+  "documents": [
+    {
+      "id": 1,
+      "start_page": 1,
+      "end_page": 1,
+      "doc_type": "其他",
+      "court": null,
+      "case_no": null,
+      "date": "2023-12-18",
+      "sender": "林長宏",
+      "recipient": "陳冠蓁",
+      "defendants": [],
+      "lawyers": [],
+      "judges": [],
+      "others": [],
+      "charge": null,
+      "tags": ["信封", "書信往來", "林長宏", "陳冠蓁"],
+      "summary": "林長宏寄給陳冠蓁的信封，嘉義縣鹿草鄉寄出，2023年12月18日收發章",
+      "notes": null
+    },
+    {
+      "id": 2,
+      "start_page": 2,
+      "end_page": 2,
+      "doc_type": "其他",
+      "court": null,
+      "case_no": null,
+      "date": null,
+      "sender": "林長宏",
+      "recipient": "陳冠蓁",
+      "defendants": [],
+      "lawyers": [],
+      "judges": [],
+      "others": [],
+      "charge": null,
+      "tags": ["書信", "手寫信件", "請求復合", "林長宏"],
+      "summary": "林長宏親筆寫給陳冠蓁的手寫信，表達悔意並請求再次機會，含兩處手寫字跡不清",
+      "notes": "第2頁有兩處[QA疑似錯誤]標記，手寫字跡不清無法辨識"
+    }
+  ]
+}

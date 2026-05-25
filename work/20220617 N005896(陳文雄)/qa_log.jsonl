@@ -1,0 +1,5 @@
+{"chunk": "chunk_001-003", "page": 1, "type": "flag", "original": "【司法院行政人和處函】", "corrected": null, "confidence": "low", "note": "機關名稱「行政人和處」語意不通，疑為 OCR 誤讀，可能原文為「行政人員處」或「行政函」等"}
+{"chunk": "chunk_001-003", "page": 1, "type": "flag", "original": "（件人和處函號：N005896）", "corrected": null, "confidence": "low", "note": "「件人和處」語意不通，疑為 OCR 誤讀機關名稱或來文欄位說明文字"}
+{"chunk": "chunk_001-003", "page": 3, "type": "flag", "original": "陳小律", "corrected": null, "confidence": "low", "note": "語境中出現「陳小律」疑為 OCR 誤讀，可能為人名（如「陳○律師」）或其他稱謂"}
+{"chunk": "chunk_001-003", "page": 3, "type": "flag", "original": "以上視野告知白服", "corrected": null, "confidence": "low", "note": "「白服」語意不通，疑為 OCR 誤讀，可能原文為「敬服」、「拜服」或其他詞彙"}
+{"chunk": "chunk_001-003", "page": 3, "type": "flag", "original": "民 5.6.17", "corrected": null, "confidence": "low", "note": "出生日期格式破碎，「民」後年份僅一位數「5」，疑為 OCR 漏讀，可能原文為「民國 56 年 1 月 17 日」或類似完整日期"}

@@ -1,0 +1,43 @@
+{
+  "_schema_version": "1",
+  "input": {
+    "file_id": "15tZunOFxtfoyXp6mXW8zrnmi-TkYBWjy",
+    "file_name": "20231218 N006744（邱明治）_問冠蓁.pdf",
+    "folder_id": "1zt6KC7JmK_5-fy7TF6QI2u_wEO7ZtunT",
+    "downloaded_at": "2026-05-24T07:31:53.332400+00:00",
+    "local_pdf_path": "work/20231218 N006744（邱明治）_問冠蓁/20231218 N006744（邱明治）_問冠蓁.pdf",
+    "md5_checksum": "e925a061725a3122b41269dcbffe3e92"
+  },
+  "output_folder_id": "1e46MBvirdKZ0dgvqYjMMkNQu7gT0RBFd",
+  "pipeline_status": "complete",
+  "uploads": {
+    "bookmarked_pdf": {
+      "status": "uploaded",
+      "local_path": "/Users/lc/ocr-archive/work/20231218 N006744（邱明治）_問冠蓁/20231218 N006744（邱明治）_問冠蓁/20231218 N006744（邱明治）_問冠蓁_bookmarked.pdf",
+      "drive_file_id": "1AHyYCDggMyvx6MNqIsUml6Fbvnbx990Z",
+      "drive_url": "https://drive.google.com/file/d/1AHyYCDggMyvx6MNqIsUml6Fbvnbx990Z/view",
+      "uploaded_at": "2026-05-24T07:43:17.495297+00:00",
+      "error": null
+    },
+    "ocr_markdown": {
+      "status": "uploaded",
+      "local_path": "/Users/lc/ocr-archive/work/20231218 N006744（邱明治）_問冠蓁/20231218 N006744（邱明治）_問冠蓁/chunk_001-002/ocr_corrected.md",
+      "drive_file_id": "1JhkHANddIjYndJGfT1Z3JzJtzmjc5vZr",
+      "drive_url": "https://drive.google.com/file/d/1JhkHANddIjYndJGfT1Z3JzJtzmjc5vZr/view",
+      "uploaded_at": "2026-05-24T07:43:20.449196+00:00",
+      "error": null
+    },
+    "sheet_rows": {
+      "status": "appended",
+      "local_csv_path": "/Users/lc/ocr-archive/work/20231218 N006744（邱明治）_問冠蓁/20231218 N006744（邱明治）_問冠蓁/20231218 N006744（邱明治）_問冠蓁_sheet.csv",
+      "spreadsheet_id": "1ZNJjoYUeYbfLm4D1vlGUpey5jGCofkSGHFOPTeFNjd4",
+      "spreadsheet_url": "https://docs.google.com/spreadsheets/d/1ZNJjoYUeYbfLm4D1vlGUpey5jGCofkSGHFOPTeFNjd4/edit",
+      "tab_name": "Archive",
+      "rows_appended": 1,
+      "appended_at": "2026-05-24T07:43:22.353468+00:00",
+      "error": null
+    }
+  },
+  "created_at": "2026-05-24T07:31:51.470269+00:00",
+  "updated_at": "2026-05-24T07:43:22.817504+00:00"
+}

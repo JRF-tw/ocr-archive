@@ -1,0 +1,2 @@
+{"chunk": "chunk_001-002", "page": 1, "type": "flag", "original": "4[?]樓", "corrected": null, "confidence": "low", "note": "信封收件地址樓層數字 OCR 失讀，原文疑為「4X樓」，X 無法辨識"}
+{"chunk": "chunk_001-002", "page": 1, "type": "flag", "original": "【KERR 軍作人郵遞服務】", "corrected": null, "confidence": "low", "note": "英文字母 KERR 及「軍作人」語意不通，疑為郵遞業者印章或貼紙遭 OCR 誤讀"}

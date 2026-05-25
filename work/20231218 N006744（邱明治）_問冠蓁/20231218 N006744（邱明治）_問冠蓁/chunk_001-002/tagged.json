@@ -1,0 +1,43 @@
+{
+  "source": "ocr_corrected.md",
+  "documents": [
+    {
+      "id": 1,
+      "start_page": 1,
+      "end_page": 1,
+      "doc_type": "其他",
+      "court": null,
+      "case_no": null,
+      "date": "2023-12-18",
+      "sender": null,
+      "recipient": "陳冠蓁",
+      "defendants": [],
+      "lawyers": [],
+      "judges": [],
+      "others": [],
+      "charge": null,
+      "tags": ["信封", "陳冠蓁", "國稅局收發"],
+      "summary": "寄給陳冠蓁小姐的信封，寄件人來自台東東河，2023.12.18財政部北區國稅局台北分局收發章",
+      "notes": "寄件人地址部分模糊，[QA疑似錯誤: 答附]"
+    },
+    {
+      "id": 2,
+      "start_page": 2,
+      "end_page": 2,
+      "doc_type": "其他",
+      "court": null,
+      "case_no": null,
+      "date": null,
+      "sender": "李郁[?]",
+      "recipient": "陳冠蓁",
+      "defendants": [],
+      "lawyers": [],
+      "judges": [],
+      "others": ["周漢斯"],
+      "charge": null,
+      "tags": ["手寫信", "陳冠蓁", "房屋", "財產"],
+      "summary": "手寫信致陳冠蓁小姐，提及周漢斯（農曆112年2月11日過世）及房屋財產問題，估款約四萬五",
+      "notes": "手寫字跡潦草，語意不連貫，部分文字難以辨識，簽名末字不清"
+    }
+  ]
+}

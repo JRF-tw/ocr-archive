@@ -1,0 +1,12 @@
+{
+  "pdf_path": "/Users/lc/ocr-archive/work/20231213 N002760（陳毓賢）_問政翔/20231213 N002760（陳毓賢）_問政翔.pdf",
+  "total_pages": 2,
+  "chunks": [
+    {
+      "chunk_id": "chunk_001-002",
+      "start_page": 1,
+      "end_page": 2,
+      "status": "done"
+    }
+  ]
+}

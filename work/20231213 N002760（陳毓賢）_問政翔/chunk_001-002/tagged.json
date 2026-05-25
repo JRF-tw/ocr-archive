@@ -1,0 +1,43 @@
+{
+  "source": "ocr_corrected.md",
+  "documents": [
+    {
+      "id": 1,
+      "start_page": 1,
+      "end_page": 1,
+      "doc_type": "其他",
+      "court": null,
+      "case_no": null,
+      "date": "2023-12-13",
+      "sender": "高雄市大寮區仁德新村1號",
+      "recipient": "問政翔",
+      "defendants": [],
+      "lawyers": [],
+      "judges": [],
+      "others": ["問政翔"],
+      "charge": null,
+      "tags": ["信封", "高雄", "郵件"],
+      "summary": "2023年12月13日由高雄寄往台北收件人問政翔的信封正面。",
+      "notes": "收件人地址疑有樓層OCR錯誤（4[?]樓）；寄件人僅有地址無姓名。"
+    },
+    {
+      "id": 2,
+      "start_page": 2,
+      "end_page": 2,
+      "doc_type": "聲請書",
+      "court": null,
+      "case_no": null,
+      "date": "2023-12-01",
+      "sender": "陳毓賢",
+      "recipient": null,
+      "defendants": [],
+      "lawyers": [],
+      "judges": [],
+      "others": ["陳毓賢"],
+      "charge": null,
+      "tags": ["聲請書", "陳情", "陳毓賢"],
+      "summary": "聲請人陳毓賢具狀陳情，請求鑒核處理其遭受損害一事，日期為民國112年12月。",
+      "notes": "大量文字OCR辨識不清（多處[?]），內文案由、具體事實及請求事項均無法完整辨識；日期僅知112年12月，確切日數缺漏，ISO日期以月份第一日代入。"
+    }
+  ]
+}

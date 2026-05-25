@@ -1,0 +1,22 @@
+{
+  "source": "ocr_corrected.md",
+  "page_offset": 1,
+  "segments": [
+    {
+      "id": 1,
+      "start_page": 1,
+      "end_page": 2,
+      "doc_type_hint": "郵件信封（正面與背面）",
+      "boundary_confidence": "high",
+      "boundary_note": ""
+    },
+    {
+      "id": 2,
+      "start_page": 3,
+      "end_page": 4,
+      "doc_type_hint": "手寫陳情書信",
+      "boundary_confidence": "high",
+      "boundary_note": ""
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "pdf": "20220617 N005896(陳文雄).pdf",
+  "pdf_path": "/Users/lc/ocr-archive/work/20220617 N005896(陳文雄)/20220617 N005896(陳文雄).pdf",
+  "total_pages": 3,
+  "chunk_size": 50,
+  "chunks": [
+    {"id": "chunk_001-003", "start": 1, "end": 3, "status": "done"}
+  ],
+  "pipeline_step": "complete"
+}

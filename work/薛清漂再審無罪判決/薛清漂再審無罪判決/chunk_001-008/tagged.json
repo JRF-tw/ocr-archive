@@ -1,0 +1,43 @@
+{
+  "source": "ocr_corrected.md",
+  "documents": [
+    {
+      "id": 1,
+      "start_page": 1,
+      "end_page": 1,
+      "doc_type": "公文封",
+      "court": "臺灣嘉義地方法院",
+      "case_no": "113年度再字第2號",
+      "date": null,
+      "sender": "臺灣嘉義地方法院",
+      "recipient": "薛清漂",
+      "defendants": ["薛清漂"],
+      "lawyers": ["李冠衛"],
+      "judges": [],
+      "others": [],
+      "charge": "妨害兵役治罪條例（AI推斷）",
+      "tags": ["公文封", "再審", "嘉義", "送達"],
+      "summary": "113年度再字第2號再審案公文封，寄送被告薛清漂及選任辯護人李冠衛律師",
+      "notes": null
+    },
+    {
+      "id": 2,
+      "start_page": 2,
+      "end_page": 8,
+      "doc_type": "判決書",
+      "court": "臺灣嘉義地方法院",
+      "case_no": "113年度再字第2號",
+      "date": "2025-03-31",
+      "sender": "臺灣嘉義地方法院",
+      "recipient": null,
+      "defendants": ["薛清漂"],
+      "lawyers": ["林佳萱", "簡正民", "李冠衛"],
+      "judges": ["何俗榮"],
+      "others": ["顏馨松", "徐紹婷", "吳唐泓", "李承翰"],
+      "charge": "妨害兵役治罪條例第10條第1項第2款",
+      "tags": ["再審", "無罪", "兵役", "禁役"],
+      "summary": "113年度再字第2號再審刑事判決，被告薛清漂因已具禁役資格喪失後備軍人身分，判決無罪",
+      "notes": "OCR品質部分較差，第3頁末段及第7、8頁有多處疑似錯誤標記，建議人工複查"
+    }
+  ]
+}

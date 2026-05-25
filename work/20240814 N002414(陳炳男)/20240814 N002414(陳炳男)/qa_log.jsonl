@@ -1,0 +1,3 @@
+{"chunk": "chunk_001-002", "page": 1, "type": "flag", "original": "Z Z L 4 8", "corrected": null, "confidence": "low", "note": "掛號收件人郵遞區號含字母，應為純數字郵遞區號，疑為OCR誤讀（字母Z、L可能誤讀自數字）"}
+{"chunk": "chunk_001-002", "page": 2, "type": "flag", "original": "22 年", "corrected": null, "confidence": "low", "note": "本件日期為民國113年（2024年），狀紙中記載案發年份「22年」明顯偏低，疑為OCR誤讀，可能為112年或113年"}
+{"chunk": "chunk_001-002", "page": 2, "type": "flag", "original": "台灣[?]地方法院", "corrected": null, "confidence": "low", "note": "法院名稱中地區字樣無法辨識，依信封收件地址（台北市中山區）推測應為「台灣台北地方法院」，待人工確認"}

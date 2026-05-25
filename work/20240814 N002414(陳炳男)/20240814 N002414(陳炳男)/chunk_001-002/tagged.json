@@ -1,0 +1,43 @@
+{
+  "source": "ocr_corrected.md",
+  "documents": [
+    {
+      "id": 1,
+      "start_page": 1,
+      "end_page": 1,
+      "doc_type": "信封",
+      "court": null,
+      "case_no": null,
+      "date": "2024-08-11",
+      "sender": "陳炳男（台北看守所）",
+      "recipient": "林韡婷",
+      "defendants": ["陳炳男"],
+      "lawyers": [],
+      "judges": [],
+      "others": [],
+      "charge": null,
+      "tags": ["信封", "羈押中被告", "台北看守所"],
+      "summary": "陳炳男自台北看守所寄予林韡婷之信封，收發章日期2024年8月11日",
+      "notes": "掛號郵遞區號含疑似誤讀字元（QA已標記）；收件人地址部分模糊"
+    },
+    {
+      "id": 2,
+      "start_page": 2,
+      "end_page": 2,
+      "doc_type": "聲請書",
+      "court": "台灣地方法院",
+      "case_no": null,
+      "date": "2024-08",
+      "sender": "陳炳男",
+      "recipient": "台灣地方法院",
+      "defendants": ["陳炳男"],
+      "lawyers": [],
+      "judges": [],
+      "others": [],
+      "charge": null,
+      "tags": ["聲請書", "停止羈押", "交保候審", "辯護權"],
+      "summary": "被告陳炳男自台北看守所具狀聲請停止羈押及交保候審，主張無辜並陳述四項理由",
+      "notes": "法院地區字樣模糊（QA已標記）；案發年份「22年」疑為OCR誤讀，應為113年（2024年）；確切日期不明"
+    }
+  ]
+}

@@ -1,0 +1,2 @@
+{"chunk": "chunk_001-002", "page": 1, "type": "flag", "original": "答附", "corrected": null, "confidence": "low", "note": "地址中「答附」疑為 OCR 錯誤，原文可能為鄉鎮村里名稱的一部分（如「答附」非正常中文地址用語）"}
+{"chunk": "chunk_001-002", "page": 2, "type": "flag", "original": "[?]", "corrected": null, "confidence": "low", "note": "署名末字無法辨識，OCR 原文已標記為 [?]，疑為手寫字跡模糊所致"}

@@ -1,0 +1,43 @@
+{
+  "_schema_version": "1",
+  "input": {
+    "file_id": null,
+    "file_name": null,
+    "folder_id": null,
+    "downloaded_at": null,
+    "local_pdf_path": null,
+    "md5_checksum": null
+  },
+  "output_folder_id": "1OBPKshN4on8WA55YvyaNZkE4uebmrj3w",
+  "pipeline_status": null,
+  "uploads": {
+    "bookmarked_pdf": {
+      "status": "uploaded",
+      "local_path": "/Users/lc/ocr-archive/work/薛清漂再審無罪判決/薛清漂再審無罪判決/薛清漂再審無罪判決_bookmarked.pdf",
+      "drive_file_id": "1tZ_HHgv7O1rfvZnEa8PHp9ygGKk6RciV",
+      "drive_url": "https://drive.google.com/file/d/1tZ_HHgv7O1rfvZnEa8PHp9ygGKk6RciV/view",
+      "uploaded_at": "2026-05-25T05:18:40.379932+00:00",
+      "error": null
+    },
+    "ocr_markdown": {
+      "status": "uploaded",
+      "local_path": "/Users/lc/ocr-archive/work/薛清漂再審無罪判決/薛清漂再審無罪判決/chunk_001-008/ocr_corrected.md",
+      "drive_file_id": "101OOqOQAOusvSRJYJSOAxEZKTRJo5jdc",
+      "drive_url": "https://drive.google.com/file/d/101OOqOQAOusvSRJYJSOAxEZKTRJo5jdc/view",
+      "uploaded_at": "2026-05-25T05:18:42.836545+00:00",
+      "error": null
+    },
+    "sheet_rows": {
+      "status": "appended",
+      "local_csv_path": "/Users/lc/ocr-archive/work/薛清漂再審無罪判決/薛清漂再審無罪判決/薛清漂再審無罪判決_sheet.csv",
+      "spreadsheet_id": "1ZNJjoYUeYbfLm4D1vlGUpey5jGCofkSGHFOPTeFNjd4",
+      "spreadsheet_url": "https://docs.google.com/spreadsheets/d/1ZNJjoYUeYbfLm4D1vlGUpey5jGCofkSGHFOPTeFNjd4/edit",
+      "tab_name": "Archive",
+      "rows_appended": 1,
+      "appended_at": "2026-05-25T05:18:45.265451+00:00",
+      "error": null
+    }
+  },
+  "created_at": "2026-05-25T05:18:34.765087+00:00",
+  "updated_at": "2026-05-25T05:18:45.265542+00:00"
+}

@@ -1,0 +1,174 @@
+{
+  "source": "19910324,士林分檢,80年相字第234號.pdf",
+  "page_offset": 1,
+  "segments": [
+    {
+      "id": 1,
+      "start_page": 1,
+      "end_page": 1,
+      "doc_type_hint": "卷宗封面",
+      "boundary_confidence": "high",
+      "boundary_note": ""
+    },
+    {
+      "id": 2,
+      "start_page": 2,
+      "end_page": 2,
+      "doc_type_hint": "目錄頁",
+      "boundary_confidence": "high",
+      "boundary_note": ""
+    },
+    {
+      "id": 3,
+      "start_page": 3,
+      "end_page": 3,
+      "doc_type_hint": "相驗案件報告",
+      "boundary_confidence": "medium",
+      "boundary_note": "頁面含案件報告表格及目錄，可能為複合頁"
+    },
+    {
+      "id": 4,
+      "start_page": 4,
+      "end_page": 4,
+      "doc_type_hint": "電請相驗案件報告",
+      "boundary_confidence": "high",
+      "boundary_note": ""
+    },
+    {
+      "id": 5,
+      "start_page": 5,
+      "end_page": 5,
+      "doc_type_hint": "電請相驗案件報告",
+      "boundary_confidence": "high",
+      "boundary_note": ""
+    },
+    {
+      "id": 6,
+      "start_page": 6,
+      "end_page": 7,
+      "doc_type_hint": "偵訊筆錄",
+      "boundary_confidence": "medium",
+      "boundary_note": "OCR品質差，內容難以辨讀，但具備問答格式及簽名欄"
+    },
+    {
+      "id": 7,
+      "start_page": 8,
+      "end_page": 9,
+      "doc_type_hint": "勘驗筆錄",
+      "boundary_confidence": "high",
+      "boundary_note": ""
+    },
+    {
+      "id": 8,
+      "start_page": 10,
+      "end_page": 10,
+      "doc_type_hint": "相驗屍體證明書",
+      "boundary_confidence": "high",
+      "boundary_note": ""
+    },
+    {
+      "id": 9,
+      "start_page": 11,
+      "end_page": 11,
+      "doc_type_hint": "相驗屍體證明書",
+      "boundary_confidence": "high",
+      "boundary_note": ""
+    },
+    {
+      "id": 10,
+      "start_page": 12,
+      "end_page": 17,
+      "doc_type_hint": "驗斷書",
+      "boundary_confidence": "medium",
+      "boundary_note": "p.12為驗斷書封面（直排標題），p.13-15為一般/局部勘驗及論斷（女性被害人），p.16-17為身體部位示意圖附件，推測同屬一份驗斷書"
+    },
+    {
+      "id": 11,
+      "start_page": 18,
+      "end_page": 23,
+      "doc_type_hint": "驗斷書",
+      "boundary_confidence": "medium",
+      "boundary_note": "p.18為驗斷書封面（直排標題），p.19-21為一般/局部勘驗及論斷（死者吳銘漢），p.22-23為身體部位示意圖附件，推測同屬一份驗斷書"
+    },
+    {
+      "id": 12,
+      "start_page": 24,
+      "end_page": 24,
+      "doc_type_hint": "辦案進行單",
+      "boundary_confidence": "high",
+      "boundary_note": ""
+    },
+    {
+      "id": 13,
+      "start_page": 25,
+      "end_page": 25,
+      "doc_type_hint": "通知書",
+      "boundary_confidence": "high",
+      "boundary_note": ""
+    },
+    {
+      "id": 14,
+      "start_page": 26,
+      "end_page": 26,
+      "doc_type_hint": "點名單",
+      "boundary_confidence": "high",
+      "boundary_note": ""
+    },
+    {
+      "id": 15,
+      "start_page": 27,
+      "end_page": 28,
+      "doc_type_hint": "訊問筆錄",
+      "boundary_confidence": "medium",
+      "boundary_note": "p.27為訊問筆錄主頁（楊文助），p.28左半為函件，右半為筆錄內容，可能為複合頁"
+    },
+    {
+      "id": 16,
+      "start_page": 29,
+      "end_page": 29,
+      "doc_type_hint": "看守所通知書",
+      "boundary_confidence": "high",
+      "boundary_note": ""
+    },
+    {
+      "id": 17,
+      "start_page": 30,
+      "end_page": 32,
+      "doc_type_hint": "函",
+      "boundary_confidence": "medium",
+      "boundary_note": "p.30-31為臺北縣警察局汐止分局申請監聽函，p.32為監聽命令書詳情，三頁合為一件監聽申請"
+    },
+    {
+      "id": 18,
+      "start_page": 33,
+      "end_page": 33,
+      "doc_type_hint": "勘驗筆錄",
+      "boundary_confidence": "medium",
+      "boundary_note": "OCR品質差，但可見勘驗筆錄標題及問答格式"
+    },
+    {
+      "id": 19,
+      "start_page": 34,
+      "end_page": 35,
+      "doc_type_hint": "偵訊筆錄",
+      "boundary_confidence": "high",
+      "boundary_note": "鄰居證人詢問筆錄，含關防印章及檢察官崔化銘簽名"
+    },
+    {
+      "id": 20,
+      "start_page": 36,
+      "end_page": 36,
+      "doc_type_hint": "相驗結果報告",
+      "boundary_confidence": "high",
+      "boundary_note": ""
+    },
+    {
+      "id": 21,
+      "start_page": 37,
+      "end_page": 37,
+      "doc_type_hint": "辦理事項表",
+      "boundary_confidence": "low",
+      "boundary_note": "左側為相驗案件報告行政表格，右側為臺北市刑警隊函件，雙頁對開，難以分割"
+    }
+  ]
+}

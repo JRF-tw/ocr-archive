@@ -56,6 +56,31 @@ class GoogleSheetsClient:
                 f"Failed to get pending jobs from {spreadsheet_id}/{tab}: {e}"
             ) from e
 
+    def get_failed_jobs(self, spreadsheet_id: str, tab: str) -> list[dict]:
+        """Return rows from the Queue tab where status is 'failed'."""
+        try:
+            result = (
+                self.sheets.values()
+                .get(spreadsheetId=spreadsheet_id, range=tab)
+                .execute()
+            )
+            rows = result.get("values", [])
+            if not rows:
+                return []
+
+            headers = rows[0]
+            failed: list[dict] = []
+            for row in rows[1:]:
+                padded = row + [""] * (len(headers) - len(row))
+                record = dict(zip(headers, padded))
+                if record.get("status") == "failed":
+                    failed.append(record)
+            return failed
+        except HttpError as e:
+            raise RuntimeError(
+                f"Failed to get failed jobs from {spreadsheet_id}/{tab}: {e}"
+            ) from e
+
     def update_job_status(
         self, spreadsheet_id: str, tab: str, file_id: str, status: str, **fields
     ) -> None:
