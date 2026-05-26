@@ -142,14 +142,13 @@ def _run_ocr(pdf_path: Path, max_retries: int = 3, retry_wait: int = 70) -> int:
     from transient API rate-limit errors (429).
     """
     project_root = Path(__file__).parent.parent
-    cmd = [
-        "claude",
-        "-p",
-        f"/ocr-legal-pdf {pdf_path}",
-        "--dangerously-skip-permissions",
-    ]
     for attempt in range(1, max_retries + 1):
-        result = subprocess.run(cmd, cwd=str(project_root))
+        result = subprocess.run(
+            ["claude", "--print", "--dangerously-skip-permissions"],
+            input=f"/ocr-legal-pdf {pdf_path}",
+            text=True,
+            cwd=str(project_root),
+        )
         if result.returncode == 0:
             return 0
         if attempt < max_retries:
