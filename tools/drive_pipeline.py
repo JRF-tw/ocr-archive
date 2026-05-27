@@ -195,8 +195,17 @@ def _run_single(
     pdf_stem = Path(file_name).stem
     work_dir = work_root / pdf_stem
     if work_dir.exists():
-        import shutil
-        shutil.rmtree(work_dir)
+        import shutil, json as _json
+        existing_manifest = work_dir / "drive_manifest.json"
+        existing_file_id = None
+        if existing_manifest.exists():
+            try:
+                with open(existing_manifest) as _f:
+                    existing_file_id = _json.load(_f).get("input", {}).get("file_id")
+            except Exception:
+                pass
+        if existing_file_id != file_id:
+            shutil.rmtree(work_dir)
     work_dir.mkdir(parents=True, exist_ok=True)
 
     # Update Queue to running BEFORE download (EC-3)
