@@ -21,6 +21,18 @@ All tools are in `tools/`. Prompts are in `tools/prompts/` (YAML, edit freely).
 
 **Never read many images in one session.** Each image consumes context. Reading 54 pages in one session fills the context window and forces a long, expensive write at the end.
 
+### CRITICAL: One chunk per session
+
+**Process exactly ONE chunk per session, then exit with success.**
+
+- Read `state.json` to find the first chunk where `status != "done"`
+- Process only that chunk (Steps 1 → 2 → 2.5 → 3 → 4)
+- Update `state.json` to mark that chunk as `"done"`
+- If all chunks are done, proceed to Steps 4b → 5 → 6 → 7, then exit
+- Exit cleanly — the pipeline will be re-invoked for the next chunk
+
+This prevents context overflow on large PDFs.
+
 ### Required workflow when this skill is triggered:
 
 1. **Enter plan mode immediately** — create `TaskCreate` entries for every batch before touching any files.
