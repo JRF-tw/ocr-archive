@@ -56,7 +56,27 @@ class GoogleSheetsClient:
                 f"Failed to get pending jobs from {spreadsheet_id}/{tab}: {e}"
             ) from e
 
-    def get_failed_jobs(self, spreadsheet_id: str, tab: str) -> list[dict]:
+    def get_running_jobs(self, spreadsheet_id: str, tab: str) -> list[dict]:
+        """Return rows from the Queue tab where status is 'running'."""
+        try:
+            result = self.service.spreadsheets().values().get(
+                spreadsheetId=spreadsheet_id,
+                range=f"{tab}!A:H",
+            ).execute()
+            rows = result.get("values", [])
+            if not rows:
+                return []
+            headers = rows[0]
+            running = []
+            for row in rows[1:]:
+                record = dict(zip(headers, row + [""] * (len(headers) - len(row))))
+                if record.get("status") == "running":
+                    running.append(record)
+            return running
+        except Exception as e:
+            raise RuntimeError(f"Failed to get running jobs: {e}") from e
+
+
         """Return rows from the Queue tab where status is 'failed'."""
         try:
             result = (

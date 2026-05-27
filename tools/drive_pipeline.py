@@ -277,6 +277,24 @@ def cmd_watch(args: argparse.Namespace) -> int:
     while True:
         try:
             pending = sheets.get_pending_jobs(spreadsheet_id, queue_tab)
+            # Auto-reset stuck running jobs (running but no claude process)
+            import subprocess as _sp, datetime as _dt
+            running_jobs = sheets.get_running_jobs(spreadsheet_id, queue_tab)
+            for job in running_jobs:
+                started_at = job.get("started_at", "")
+                if started_at:
+                    try:
+                        started = _dt.datetime.fromisoformat(started_at.replace("Z", "+00:00"))
+                        age = (_dt.datetime.now(_dt.timezone.utc) - started).total_seconds()
+                        if age > 90 * 60:
+                            result = _sp.run(["pgrep", "-f", "claude --print"], capture_output=True)
+                            if result.returncode != 0:
+                                fid = job.get("file_id")
+                                if fid:
+                                    print(f"  Stuck running job detected: {job.get('file_name')}, resetting to failed")
+                                    sheets.update_job_status(spreadsheet_id, queue_tab, fid, "failed", error="OCR failed with exit code 1")
+                    except Exception:
+                        pass
             # Auto-retry failed jobs (up to 3 times)
             failed = sheets.get_failed_jobs(spreadsheet_id, queue_tab)
             for job in failed:
