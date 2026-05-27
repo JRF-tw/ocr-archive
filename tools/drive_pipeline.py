@@ -194,6 +194,9 @@ def _run_single(
     file_name = metadata["name"]
     pdf_stem = Path(file_name).stem
     work_dir = work_root / pdf_stem
+    if work_dir.exists():
+        import shutil
+        shutil.rmtree(work_dir)
     work_dir.mkdir(parents=True, exist_ok=True)
 
     # Update Queue to running BEFORE download (EC-3)
