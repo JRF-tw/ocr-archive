@@ -3,8 +3,24 @@ from googleapiclient.discovery import build
 
 
 class GoogleSheetsClient:
-    def __init__(self, credentials):
-        self.service = build("sheets", "v4", credentials=credentials)
+    def __init__(self, creds_path, token_path):
+        import json, os
+        from google.oauth2.credentials import Credentials
+        from google.auth.transport.requests import Request
+        SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
+        creds = None
+        if os.path.exists(token_path):
+            creds = Credentials.from_authorized_user_file(token_path, SCOPES)
+        if not creds or not creds.valid:
+            if creds and creds.expired and creds.refresh_token:
+                creds.refresh(Request())
+            else:
+                raise RuntimeError(f"Invalid credentials at {token_path}")
+        self.service = build("sheets", "v4", credentials=creds)
+
+    @staticmethod
+    def get_spreadsheet_url(spreadsheet_id: str) -> str:
+        return f"https://docs.google.com/spreadsheets/d/{spreadsheet_id}/edit"
 
     def ensure_tab(self, spreadsheet_id: str, tab: str, headers: list[str] | None = None):
         meta = self.service.spreadsheets().get(spreadsheetId=spreadsheet_id).execute()
@@ -107,4 +123,23 @@ class GoogleSheetsClient:
             valueInputOption="RAW",
             insertDataOption="INSERT_ROWS",
             body={"values": rows},
+        ).execute()
+
+    def append_from_csv(self, spreadsheet_id: str, tab: str, csv_path) -> int:
+        import csv
+        from pathlib import Path
+        rows = []
+        with open(Path(csv_path), encoding="utf-8", newline="") as f:
+            reader = csv.reader(f)
+            next(reader, None)
+            for row in reader:
+                rows.append(row)
+        if rows:
+            self.append_rows(spreadsheet_id, tab, rows)
+        return len(rows)
+
+    def batch_update_cells(self, spreadsheet_id: str, updates: list[dict]):
+        self.service.spreadsheets().values().batchUpdate(
+            spreadsheetId=spreadsheet_id,
+            body={"valueInputOption": "RAW", "data": updates},
         ).execute()
