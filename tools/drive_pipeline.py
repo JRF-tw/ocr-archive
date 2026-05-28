@@ -135,30 +135,49 @@ def _load_tagged_json(work_dir: Path) -> dict | None:
     return None
 
 
-def _run_ocr(pdf_path: Path, max_retries: int = 3, retry_wait: int = 70) -> int:
+def _ocr_is_complete(pdf_path: Path) -> bool:
+    """Check state.json to see if all chunks are done."""
+    import json as _json
+    pdf_stem = pdf_path.stem
+    state_path = pdf_path.parent / pdf_stem / "state.json"
+    if not state_path.exists():
+        return False
+    try:
+        with open(state_path) as f:
+            state = _json.load(f)
+        chunks = state.get("chunks", [])
+        return bool(chunks) and all(c.get("status") == "done" for c in chunks)
+    except Exception:
+        return False
+
+
+def _run_ocr(pdf_path: Path, max_retries: int = 10, retry_wait: int = 70) -> int:
     """Run the OCR pipeline non-interactively via the claude CLI.
 
-    Retries up to max_retries times with retry_wait second delay to recover
-    from transient API rate-limit errors (429).
+    Calls Claude Code repeatedly until all chunks in state.json are done.
+    Each call processes one chunk (per SKILL.md one-chunk-per-session rule).
     """
     project_root = Path(__file__).parent.parent
     for attempt in range(1, max_retries + 1):
+        if _ocr_is_complete(pdf_path):
+            print(f"  All chunks complete after {attempt - 1} session(s).")
+            return 0
+        print(f"  OCR session {attempt}/{max_retries} ...")
+        sys.stdout.flush()
         result = subprocess.run(
             ["claude", "--print", "--dangerously-skip-permissions"],
             input=f"/ocr-legal-pdf {pdf_path}",
             text=True,
             cwd=str(project_root),
         )
-        if result.returncode == 0:
+        if _ocr_is_complete(pdf_path):
+            print(f"  All chunks complete.")
             return 0
         if attempt < max_retries:
-            print(
-                f"  OCR attempt {attempt}/{max_retries} failed (exit {result.returncode}),"
-                f" retrying in {retry_wait}s ..."
-            )
+            print(f"  Session {attempt} ended (exit {result.returncode}), checking progress ...")
             sys.stdout.flush()
-            time.sleep(retry_wait)
-    return result.returncode
+            time.sleep(5)
+    return 1
 
 
 # ---------------------------------------------------------------------------
