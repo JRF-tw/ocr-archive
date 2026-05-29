@@ -58,22 +58,49 @@ def classify(doc_type: str) -> str:
 # ── Bookmark label ─────────────────────────────────────────────────────────────
 
 def build_label(doc: dict) -> str:
-    """Short human-readable label for the bookmark entry."""
-    parts = [doc.get("doc_type") or "（未知）"]
+    """Short human-readable label for the bookmark entry.
 
-    parties = doc.get("parties") or []
-    if parties:
-        # Show at most 2 parties to keep labels short
-        party_str = "、".join(parties[:2])
-        if len(parties) > 2:
-            party_str += f" 等{len(parties)}人"
-        parts.append(party_str)
+    Priority:
+    1. bookmark_title (set by tag_docs prompt, format: YY.MM.DD 姓名 文件類型)
+    2. Fallback: compose from date + parties + doc_type
+    """
+    # 優先使用 tag_docs 產生的 bookmark_title
+    if doc.get("bookmark_title"):
+        return doc["bookmark_title"].strip()
 
+    # Fallback：自行組合
+    doc_type = doc.get("doc_type") or "（未知）"
+
+    # 日期：轉成民國年格式 YY.MM.DD
+    date_str = ""
     date = doc.get("date")
     if date:
-        parts.append(date)
+        try:
+            parts = date.split("-")
+            western_year = int(parts[0])
+            roc_year = western_year - 1911
+            date_str = f"{roc_year}.{parts[1]}.{parts[2]}"
+        except Exception:
+            date_str = date
 
-    return "｜".join(parts)
+    # 當事人
+    parties = []
+    for field in ("defendants", "others", "sender"):
+        val = doc.get(field)
+        if isinstance(val, list):
+            parties.extend(val)
+        elif isinstance(val, str) and val:
+            parties.append(val)
+    party_str = "".join(parties[:2]) if parties else ""
+
+    parts = []
+    if date_str:
+        parts.append(date_str)
+    if party_str:
+        parts.append(party_str)
+    parts.append(doc_type)
+
+    return " ".join(parts)
 
 
 # ── Main ───────────────────────────────────────────────────────────────────────
