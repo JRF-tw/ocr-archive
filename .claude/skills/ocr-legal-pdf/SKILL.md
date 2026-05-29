@@ -198,6 +198,7 @@ Variables to fill when dispatching:
 | `{corrected_path}` | `<work_dir>/<chunk_id>/ocr_corrected.md` |
 | `{qa_log_path}` | `<work_dir>/qa_log.jsonl` |
 | `{correction_rules}` | full contents of `tools/correction_rules.yaml` |
+| `{legal_terms}` | full contents of `tools/legal_terms.txt` |
 | `{ocr_content}` | full contents of `ocr.md` |
 
 **Outputs:**
@@ -406,7 +407,7 @@ All prompts are YAML files in `tools/prompts/`. Supported template variables:
 
 | File | Variables |
 |------|-----------|
-| `qa_ocr.yaml` | `{source}`, `{chunk_id}`, `{start_page}`, `{end_page}`, `{corrected_path}`, `{qa_log_path}`, `{correction_rules}`, `{ocr_content}` |
+| `qa_ocr.yaml` | `{source}`, `{chunk_id}`, `{start_page}`, `{end_page}`, `{corrected_path}`, `{qa_log_path}`, `{correction_rules}`, `{ocr_content}`, `{legal_terms}` |
 | `segment_docs.yaml` | `{source}`, `{n_pages}`, `{page_offset}`, `{content}` |
 | `tag_docs.yaml` | `{source}`, `{content}`, `{segments}` |
 
