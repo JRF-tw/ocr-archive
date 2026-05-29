@@ -27,6 +27,15 @@ from tools.google_sheets_client import GoogleSheetsClient
 # Helpers
 # ---------------------------------------------------------------------------
 
+def _load_legal_terms() -> str:
+    """Load legal terms vocabulary for QA prompt."""
+    terms_path = Path(__file__).parent / "legal_terms.txt"
+    if terms_path.exists():
+        with open(terms_path, encoding="utf-8") as f:
+            return f.read().strip()
+    return ""
+
+
 def _load_config(args: argparse.Namespace) -> dict:
     """Load config from ~/.jrf/drive_config.json, overlay CLI flags."""
     config_path = Path(args.config_path)
@@ -576,6 +585,138 @@ def cmd_upload(args: argparse.Namespace) -> int:
             )
             drive_manifest.save(manifest, work_dir)
             any_failed = True
+
+    # --- 4b. Export interview sheet CSV and append to 訊問筆錄索引 ---
+    interview_sheet_id = config.get("interview_sheet_id")
+    interview_tab = config.get("interview_tab", "訊問筆錄索引")
+    if interview_sheet_id:
+        try:
+            import subprocess as _sub
+            interview_csv = work_dir / f"{pdf_stem}_interview_sheet.csv"
+            tagged_json = None
+            for _candidate in (
+                work_dir / "merged_tagged.json",
+                *sorted(work_dir.glob("**/merged_tagged.json")),
+                *sorted(work_dir.glob("**/tagged.json")),
+            ):
+                if _candidate.exists():
+                    tagged_json = _candidate
+                    break
+            if tagged_json:
+                _sub.run(
+                    [sys.executable, "tools/export_interview_sheet.py",
+                     str(tagged_json),
+                     "--volume", volume or pdf_stem,
+                     "--output", str(interview_csv)],
+                    cwd=str(Path(__file__).parent.parent),
+                    check=False,
+                )
+                if interview_csv.exists():
+                    sheets.ensure_tab(interview_sheet_id, interview_tab,
+                                      ["卷別", "頁數", "筆錄", "姓名", "身份", "備註"])
+                    sheets.append_from_csv(interview_sheet_id, interview_tab, interview_csv)
+                    print(f"  訊問筆錄索引：已寫入 {interview_sheet_id}")
+        except Exception as _e:
+            print(f"  WARNING: 訊問筆錄索引寫入失敗：{_e}", file=sys.stderr)
+
+    # --- 4b. Export interview sheet and append to 訊問筆錄索引 ---
+    interview_sheet_id = config.get("interview_sheet_id")
+    interview_tab = config.get("interview_tab", "訊問筆錄索引")
+    if interview_sheet_id:
+        try:
+            import subprocess as _sub
+            interview_csv = work_dir / f"{pdf_stem}_interview_sheet.csv"
+            tagged_json = None
+            for _candidate in (
+                work_dir / "merged_tagged.json",
+                *sorted(work_dir.glob("**/merged_tagged.json")),
+                *sorted(work_dir.glob("**/tagged.json")),
+            ):
+                if _candidate.exists():
+                    tagged_json = _candidate
+                    break
+            if tagged_json:
+                _sub.run(
+                    [sys.executable, "tools/export_interview_sheet.py",
+                     str(tagged_json),
+                     "--volume", volume or pdf_stem,
+                     "--output", str(interview_csv)],
+                    cwd=str(Path(__file__).parent.parent),
+                    check=False,
+                )
+                if interview_csv.exists():
+                    sheets.ensure_tab(interview_sheet_id, interview_tab,
+                                      ["卷別", "頁數", "筆錄", "姓名", "身份", "備註"])
+                    sheets.append_from_csv(interview_sheet_id, interview_tab, interview_csv)
+                    print(f"  訊問筆錄索引：已寫入 {interview_sheet_id}")
+        except Exception as _e:
+            print(f"  WARNING: 訊問筆錄索引寫入失敗：{_e}", file=sys.stderr)
+
+    # --- 4b. Export interview sheet and append to 訊問筆錄索引 ---
+    interview_sheet_id = config.get("interview_sheet_id")
+    interview_tab = config.get("interview_tab", "訊問筆錄索引")
+    if interview_sheet_id:
+        try:
+            import subprocess as _sub
+            interview_csv = work_dir / f"{pdf_stem}_interview_sheet.csv"
+            tagged_json = None
+            for _candidate in (
+                work_dir / "merged_tagged.json",
+                *sorted(work_dir.glob("**/merged_tagged.json")),
+                *sorted(work_dir.glob("**/tagged.json")),
+            ):
+                if _candidate.exists():
+                    tagged_json = _candidate
+                    break
+            if tagged_json:
+                _sub.run(
+                    [sys.executable, "tools/export_interview_sheet.py",
+                     str(tagged_json),
+                     "--volume", volume or pdf_stem,
+                     "--output", str(interview_csv)],
+                    cwd=str(Path(__file__).parent.parent),
+                    check=False,
+                )
+                if interview_csv.exists():
+                    sheets.ensure_tab(interview_sheet_id, interview_tab,
+                                      ["卷別", "頁數", "筆錄", "姓名", "身份", "備註"])
+                    sheets.append_from_csv(interview_sheet_id, interview_tab, interview_csv)
+                    print(f"  訊問筆錄索引：已寫入 {interview_sheet_id}")
+        except Exception as _e:
+            print(f"  WARNING: 訊問筆錄索引寫入失敗：{_e}", file=sys.stderr)
+
+    # --- 4b. Export interview sheet CSV and append to 訊問筆錄索引 ---
+    interview_sheet_id = config.get("interview_sheet_id")
+    interview_tab = config.get("interview_tab", "訊問筆錄索引")
+    if interview_sheet_id:
+        try:
+            import subprocess as _sub
+            interview_csv = work_dir / f"{pdf_stem}_interview_sheet.csv"
+            tagged_json = None
+            for _candidate in (
+                work_dir / "merged_tagged.json",
+                *sorted(work_dir.glob("**/merged_tagged.json")),
+                *sorted(work_dir.glob("**/tagged.json")),
+            ):
+                if _candidate.exists():
+                    tagged_json = _candidate
+                    break
+            if tagged_json:
+                _sub.run(
+                    [sys.executable, "tools/export_interview_sheet.py",
+                     str(tagged_json),
+                     "--volume", volume or pdf_stem,
+                     "--output", str(interview_csv)],
+                    cwd=str(Path(__file__).parent.parent),
+                    check=False,
+                )
+                if interview_csv.exists():
+                    sheets.ensure_tab(interview_sheet_id, interview_tab,
+                                      ["卷別", "頁數", "筆錄", "姓名", "身份", "備註"])
+                    sheets.append_from_csv(interview_sheet_id, interview_tab, interview_csv)
+                    print(f"  訊問筆錄索引：已寫入 {interview_sheet_id}")
+        except Exception as _e:
+            print(f"  WARNING: 訊問筆錄索引寫入失敗：{_e}", file=sys.stderr)
 
     # --- Update Queue row ---
     if file_id:
