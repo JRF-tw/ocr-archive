@@ -69,6 +69,11 @@ instruction: |
   若此 chunk 結尾的文件可能延續到下一個 chunk，請在最後一個 segment 加上 `"continues": true`。
 
   ---
+  ## 文件類型清單（動態載入自 tools/document_types.yaml）
+
+{document_types}
+
+  ---
   以下是 OCR Markdown 內容：
 
   {content}
